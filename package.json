@@ -1,0 +1,113 @@
+{
+  "name": "leofcoin-core",
+  "version": "0.1.0",
+  "description": "leofcoin core library",
+  "repository": "https://github.com/leofcoin-io/leofcoin-core",
+  "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
+  "main": "core.js",
+  "license": "MIT",
+  "private": false,
+  "bin": {
+    "core": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "sh build/node.sh",
+    "package": "npm run build && sh build/browser.sh && node build/zip.js",
+    "start-ui": "live-server --port=2050",
+    "start": "node dist/core.js olivia"
+  },
+  "backed": {
+    "bundles": [
+      {
+        "src": "src/lib/wallet.js",
+        "dest": "dist/lib/wallet.js",
+        "format": "cjs",
+        "plugins": {
+          "json": {},
+          "node-resolve": {
+            "jsnext": true,
+            "main": true,
+            "preferBuiltins": false
+          },
+          "commonjs": {
+            "include": "node_modules/**"
+          }
+        }
+      },
+      {
+        "src": "src/lib/wallet.js",
+        "dest": "dist/lib/browser/wallet.temp.js",
+        "format": "cjs",
+        "plugins": {
+          "json": {},
+          "node-builtins": {},
+          "node-resolve": {
+            "jsnext": true,
+            "browser": true,
+            "main": true
+          },
+          "commonjs": {
+            "include": "node_modules/**"
+          }
+        }
+      },
+      {
+        "src": "src/index.js",
+        "dest": "dist/core.js",
+        "format": "cjs"
+      },
+      {
+        "src": "src/lib/workers/miner-worker.js",
+        "dest": "dist/lib/workers/miner-worker.js",
+        "format": "cjs"
+      },
+      {
+        "src": "src/utils.js",
+        "dest": "dist/lib/utils.js",
+        "format": "cjs"
+      },
+      {
+        "src": "src/lib/hash.js",
+        "dest": "dist/lib/hash.js",
+        "format": "cjs"
+      },
+      {
+        "src": "src/lib/dagchain/dagchain.js",
+        "dest": "dist/lib/dagchain/dagchain.js",
+        "format": "cjs"
+      }
+    ]
+  },
+  "dependencies": {
+    "base58": "^1.0.1",
+    "bitcoinjs-lib": "^3.3.2",
+    "bs58": "^4.0.1",
+    "cors": "^2.8.4",
+    "crypto-daemon": "^0.1.11",
+    "crypto-ecdh": "^0.2.2",
+    "crypto-io-fs": "^0.1.1",
+    "crypto-io-utils": "0.1.2",
+    "crypto-store": "^0.1.0-alpha",
+    "ecdsa": "^0.7.0",
+    "fs-ext": "^1.0.0",
+    "gpu.js": "^1.0.0",
+    "ip-monitor": "^0.1.2",
+    "ipfs": "^0.27.7",
+    "ipfs-bitswap": "^0.19.0",
+    "ipfs-repo": "^0.18.5",
+    "ipld-dag-pb": "^0.11.4",
+    "randombytes": "^2.0.6",
+    "secp256k1": "^3.4.0",
+    "socket.io": "^2.0.4",
+    "tiny-worker": "^2.1.1",
+    "websocket": "^1.0.25"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "mocha": "^5.0.1",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-resolve": "^3.0.2",
+    "tape": "^4.8.0"
+  }
+}
