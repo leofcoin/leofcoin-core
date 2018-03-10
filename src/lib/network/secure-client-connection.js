@@ -59,7 +59,7 @@ class SecureClientConnection extends EventEmitter {
       if (!exists(netKeyPath)) {
         cipher = await this.requestKey();
         const key = await this.pair.decrypt(cipher);
-        await write(keyPath, key);
+        await write(netKeyPath, key);
       }
       this.emit('connected', {address});
     });
