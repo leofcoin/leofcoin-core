@@ -2,7 +2,7 @@ import { DAGNode } from 'ipld-dag-pb';
 import { validateTransactions, createRewardTransaction } from './../transaction';
 import { hexFromMultihash, getDifficulty } from './../../utils';
 import { isValid } from './../../schemas';
-import { BlockError } from '../errors'
+import { BlockError } from '../errors';
 import * as IPFS from 'ipfs-api';
 const ipfs = new IPFS();
 
@@ -87,5 +87,3 @@ export const validate = async (previousBlock, block, difficulty, unspent) => {
 	if (getDifficulty(block.hash) > difficulty) return BlockError('difficulty');
 	return validateTransactions(block.transactions, unspent);
 };
-
-export default DAGBlock;

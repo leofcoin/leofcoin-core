@@ -42,6 +42,7 @@ npm run start
 ## TODO
 - ~~Miner support~~
 - ~~Wallet support~~
+- Send / Receive transactions
 - Explorer
 - Pool mining
 - Settings

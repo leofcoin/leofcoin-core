@@ -28,7 +28,7 @@ const transaction = object().keys({
 	})),
 });
 
-export const schemas = {
+const schemas = {
 	block,
 	transaction,
 };

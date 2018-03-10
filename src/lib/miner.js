@@ -5,7 +5,9 @@ import { nextBlock, difficulty } from './dagchain/dagchain-interface';
 import bus from './bus';
 import { fork } from 'child_process';
 import { join } from 'path';
-import { ipfs } from './dagchain/dagchain';
+// import { ipfs } from './dagchain/dagchain';
+import * as IPFS from 'ipfs-api'
+const ipfs = new IPFS();
 
 export default class Miner extends StoreHandler {
 
@@ -37,11 +39,13 @@ export default class Miner extends StoreHandler {
       this._onBlockAdded = block => {
         bus.removeListener('block-added', this._onBlockAdded);
         bus.removeListener('invalid-block', this._onBlockInvalid);
+        this.mineStop()
         resolve(block);
       }
       this._onBlockInvalid = block => {
         bus.removeListener('block-added', this._onBlockAdded);
         bus.removeListener('invalid-block', this._onBlockInvalid);
+        this.mineStop()
         resolve(null);
       }
       bus.once('block-added', this._onBlockAdded);
@@ -79,15 +83,16 @@ export default class Miner extends StoreHandler {
       bus.emit('hashrate', {uid: job, hashrate: (Math.round(rate * 100) / 100)});
     }
 
-    this.running--;
+
+
     if (block) {
       ipfs.pubsub.publish('block-added', new Buffer(JSON.stringify(block)));
-      // gets out of sync?
-      lastValidBlock = await this.onBlockAdded();
+      this.running--;
       if (this.mining) {
         this.mine(job, lastValidBlock);
       }
     } else if (this.mining) {
+      this.running--;
       this.mine(job);
     }
 
@@ -155,7 +160,7 @@ export default class Miner extends StoreHandler {
       })
       worker.send({block, difficulty});
 
-    })
+    });
   }
 
 }

@@ -126,7 +126,7 @@ const defaultConfig = {
 	bootstrap: bootstrap,
 	miner: {
 		address: networkAddress(net()),
-		intensity: 2
+		intensity: 1
 	}
 };
 

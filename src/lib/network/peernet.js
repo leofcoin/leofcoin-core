@@ -2,22 +2,28 @@ import { debug } from './../../utils';
 import bus from './../bus';
 import * as IPFS from 'ipfs-api';
 import { join } from 'path';
-import { info, fail } from 'crypto-logger';
+import { info, fail, succes } from 'crypto-logger';
 
 export const ipfs = new IPFS();
 
-const handleDefaultBootstrapAddresses = async addresses => {
+const handleDefaultBootstrapAddresses = async peers => {
   try {
     let bootstrap = await ipfs.config.get('Bootstrap');
-    for (const address of bootstrap) {
-      if (addresses.indexOf(address) === -1) {
-        const index = bootstrap.indexOf(address);
-        bootstrap = bootstrap.slice(index, 0);
+
+    for (const peer of peers) {
+      const addresses = peer.multiaddrs.toArray().forEach(address => address.toString());
+      peer.multiaddrs.toArray().forEach(address => console.log(address.toString()));
+      for (const address of bootstrap) {
+        if (addresses.indexOf(address) === -1) {
+          const index = bootstrap.indexOf(address);
+          bootstrap = bootstrap.slice(index, 0);
+        }
       }
-    }
-    for (const address of addresses) {
-      if (bootstrap.indexOf(address) === -1) {
-        bootstrap.push(address);
+
+      for (const address of addresses) {
+        if (bootstrap.indexOf(address) === -1) {
+          bootstrap.push(address);
+        }
       }
     }
 
@@ -28,21 +34,23 @@ const handleDefaultBootstrapAddresses = async addresses => {
     return 1;
   }
 }
-
-export const connect = addresses => new Promise(async resolve => {
-  try {
-    bus.emit('connecting', true);
-    debug(info('connecting peers'));
-    const connected = await ipfs.swarm.connect(addresses)
-    const peerinfo = await ipfs.dht.findpeer('QmPgX72kLV9Gopq77tMFAQfMZWBGp6Va3AFcmJyeQawTCm')
-    info('peers-connected');
+export const connect = (address) => new Promise(async (resolve) => {
+  bus.emit('connecting', true);
+  debug(info('connecting peers'));
+  ipfs.swarm.addrs(async (err, peers) => {
+    if (err) {
+      setTimeout(async () => {
+        await connect();
+      }, 200);
+    }
+    if (peers.length === 0) {
+      setTimeout(async () => {
+        await connect();
+      }, 200);
+    }
+    // await handleDefaultBootstrapAddresses(peers)
+    debug(succes(`connected to ${peers.length} peers`))
     bus.emit('connecting', false);
-    resolve();
-  } catch (e) {
-    fail(e);
-    setTimeout(async () => {
-      await connect(addresses);
-      resolve();
-    }, 200);
-  }
-});
+    resolve()
+  });
+})

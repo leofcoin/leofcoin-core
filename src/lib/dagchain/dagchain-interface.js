@@ -71,13 +71,13 @@ export const difficulty = () => {
 		stamps.push(10);
 	}
 	let blocksMedian = median(stamps) || 10;
+   // offset for quick recovery
 	if (blocksMedian < 10) {
-		blocksMedian--; // offset for quick recovery
+		blocksMedian = blocksMedian - 1.5;
 	} else if (blocksMedian > 10){
-		blocksMedian++;
+		blocksMedian = blocksMedian + 1.5;
 	}
 	console.log('median', blocksMedian);
-	console.log('dynamicDiff', (10 / blocksMedian));
 	return 10000 / (10 / blocksMedian); // should result in a block every 10 seconds
 };
 

@@ -18,7 +18,7 @@ global.states = {
   mining: false
 };
 
-const loadDaemon = new Promise((resolve, reject) => {
+const loadDaemon = () => new Promise((resolve, reject) => {
 	const daemonReady = () => {
   	daemon.removeListener('ready', daemonReady);
     resolve();
@@ -27,30 +27,6 @@ const loadDaemon = new Promise((resolve, reject) => {
 	daemon.start(['--enable-pubsub-experiment']);
 });
 
-const handleDefaultBootstrapAddresses = async addresses => {
-  debug('handleDefaultBootstrapAddresses');
-  try {
-    let bootstrap = await ipfs.config.get('Bootstrap');
-    for (const address of bootstrap) {
-      if (addresses.indexOf(address) === -1) {
-        const index = bootstrap.indexOf(address);
-        bootstrap = bootstrap.slice(index, 0);
-      }
-    }
-    for (const address of addresses) {
-      if (bootstrap.indexOf(address) === -1) {
-        bootstrap.push(address);
-      }
-    }
-
-    await ipfs.config.set('Bootstrap', bootstrap);
-    return 0;
-  } catch (error) {
-    console.error(error);
-    return 1;
-  }
-}
-
 export const core = async ({ genesis, network }) => {
 
 	try {
@@ -58,12 +34,7 @@ export const core = async ({ genesis, network }) => {
     const connection = await initConnection;
     bus.emit('stage-one');
 
-    if (config.bootstrap.indexOf(connection.address) === -1) {
-      config.bootstrap.push(connection.address);
-    }
-
-    await loadDaemon;
-    await handleDefaultBootstrapAddresses(connection.address);
+    await loadDaemon();
     await connect(connection.address);
     bus.emit('stage-two');
 

@@ -56,7 +56,7 @@ export class DAGChain extends EventEmitter {
         this.loadChain();
       }
     } catch (e) {
-      console.error(e);
+      this.newDAGChain();
     }
   }
   async resolve(name) {
@@ -157,9 +157,9 @@ export class DAGChain extends EventEmitter {
 
   addBlock(block) {
     this.chain.push(block);
-    global.chain = this.chain
-    console.log(`added block: ${block.index}`);
+    global.chain = this.chain;
     bus.emit('block-added', block);
+    console.log(`added block: ${block.index}`);
   }
 
   async writeLocals(CID, index) {
@@ -225,22 +225,18 @@ export class DAGChain extends EventEmitter {
   // TODO: go with previeus block instead off lastBlock
   // TODO: validate on sync ...
   async announceBlock(announcement) {
-    debug('announceBlock')
     if (announcement.topicIDs[0] === 'block-added') {
       try {
         const block = JSON.parse(announcement.data.toString());
         const lastBlock = await this.lastBlock();
-        await validate(lastBlock, block, difficulty(), getUnspent())
+        await validate(lastBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
         await this.sync();
         const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
         await this.pin(encode(dagnode.multihash)); // pin block locally
-        this.addBlock(block); // add to running chain
         const CID = dagnode.multihash.toString('hex'); // The CID as an base58 string
         await this.updateLocals(CID, block.index);
-        if (global.states.mining) {
-          bus.emit('block-added', block)
-        }  bus.emit('block-added', block)
+        this.addBlock(block); // add to running chain
       } catch (error) {
         bus.emit('invalid-block', block);
         return console.error(error)

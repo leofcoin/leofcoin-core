@@ -17,7 +17,7 @@ export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
 
 export const dagchain = 'QmRGE6LpXchjcZM5h6grF7cftqPUho5yw5Uya5M8qQF9KG';
-export const genesis = '122000001e2167adabed095d3f61bc63301d22920660ca94319a12ac4f8bb3485497';
+export const genesis = '122000001297ce95babca433a450344de9f04661b4e69fddc8e2025a50c125e3b555';
 export const checkpoints = [
 	'QmNLgJyShR2Nef3ncZKqTHxWVE1kvBWLpPDbPyQ9xfwfX3' // genesis block
 ];
