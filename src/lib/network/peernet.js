@@ -5,7 +5,7 @@ import { join } from 'path';
 import { info, fail, succes } from 'crypto-logger';
 import { seeds } from '../../params';
 import { DAGNode } from 'ipld-dag-pb';
-import { encode } from 'base58';
+import { encode } from 'bs58';
 const { promisify } = require('util');
 
 export const ipfs = new IPFS();
