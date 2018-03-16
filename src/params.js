@@ -10,14 +10,15 @@ export const netKeyPath = join(homedir(), '.ipfs', 'swarm.key');
 // TODO: make AppData overwriteable
 
 export const seed = 'https://septimal-balinese-2547.dataplicity.io';
+export const seeds = 'QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n';
 export const bootstrap = [];
 export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
 
-export const dagchain = 'QmRGE6LpXchjcZM5h6grF7cftqPUho5yw5Uya5M8qQF9KG';
-export const genesis = '122000001297ce95babca433a450344de9f04661b4e69fddc8e2025a50c125e3b555';
+export const dagchain = 'QmRGE6LpXchjcZM5h6grF7cftqPUho5yw5Uya5M8qQF9KG'; // QmPgX72kLV9Gopq77tMFAQfMZWBGp6Va3AFcmJyeQawTCm
+export const genesis = '122000001676d7bc4ad56642a63557ed6d81eb2107ca00b8db060d1cf32f53c92d52';
 export const checkpoints = [
 	'QmNLgJyShR2Nef3ncZKqTHxWVE1kvBWLpPDbPyQ9xfwfX3' // genesis block
 ];

@@ -35,7 +35,7 @@ export const core = async ({ genesis, network }) => {
     bus.emit('stage-one');
 
     await loadDaemon();
-    await connect(connection.address);
+    await connect([connection.address]);
     bus.emit('stage-two');
 
     write(params.configPath, JSON.stringify(config, null, 2));

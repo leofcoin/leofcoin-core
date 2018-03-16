@@ -3,16 +3,20 @@ import bus from './../bus';
 import * as IPFS from 'ipfs-api';
 import { join } from 'path';
 import { info, fail, succes } from 'crypto-logger';
+import { seeds } from '../../params';
+import { DAGNode } from 'ipld-dag-pb';
+import { encode } from 'base58';
+const { promisify } = require('util');
 
 export const ipfs = new IPFS();
-
-const handleDefaultBootstrapAddresses = async peers => {
+// TODO: create bootstrap according peer reputation ...
+const handleDefaultBootstrapAddresses = async addresses => {
   try {
     let bootstrap = await ipfs.config.get('Bootstrap');
-
-    for (const peer of peers) {
-      const addresses = peer.multiaddrs.toArray().forEach(address => address.toString());
-      peer.multiaddrs.toArray().forEach(address => console.log(address.toString()));
+    const peers = await ipfs.swarm.peers();
+    // peers.forEach(peer => console.log(peer.peer.toB58String()))
+    // addresses.forEach(address => !bootstrap.indexOf(address) )
+    for (const peer of addresses) {
       for (const address of bootstrap) {
         if (addresses.indexOf(address) === -1) {
           const index = bootstrap.indexOf(address);
@@ -34,23 +38,19 @@ const handleDefaultBootstrapAddresses = async peers => {
     return 1;
   }
 }
-export const connect = (address) => new Promise(async (resolve) => {
+export const connect = (addresses) => new Promise(async (resolve) => {
   bus.emit('connecting', true);
   debug(info('connecting peers'));
-  ipfs.swarm.addrs(async (err, peers) => {
-    if (err) {
-      setTimeout(async () => {
-        await connect();
-      }, 200);
-    }
-    if (peers.length === 0) {
-      setTimeout(async () => {
-        await connect();
-      }, 200);
-    }
-    // await handleDefaultBootstrapAddresses(peers)
-    debug(succes(`connected to ${peers.length} peers`))
-    bus.emit('connecting', false);
-    resolve()
+  const { id } = await ipfs.id();
+  addresses = addresses.map(address => address.includes(id) ? null : address);
+  await handleDefaultBootstrapAddresses(addresses);
+  await ipfs.swarm.connect(addresses);
+  debug(succes(`connected to ${addresses.length} peers`));
+  await ipfs.pubsub.publish('peer-connected', new Buffer(id));
+
+  ipfs.pubsub.subscribe('peer-connected', event => {
+    console.log(event);
   });
+  bus.emit('connecting', false);
+  resolve()
 })

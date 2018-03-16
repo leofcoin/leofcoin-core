@@ -80,10 +80,10 @@ export class DAGBlock {
  * @param {number} unspent
  */
 export const validate = async (previousBlock, block, difficulty, unspent) => {
-	if (!isValid('block', block)) return BlockError('data');
-	if (previousBlock.index + 1 !== block.index) return BlockError('index');
-	if (previousBlock.hash !== block.prevHash) return BlockError('prevhash');
-	if (await calculateHash(block) !== block.hash) return BlockError('hash');
-	if (getDifficulty(block.hash) > difficulty) return BlockError('difficulty');
+	if (!isValid('block', block)) throw BlockError('data');
+	if (previousBlock.index + 1 !== block.index) throw BlockError('index');
+	if (previousBlock.hash !== block.prevHash) throw BlockError('prevhash');
+	if (await calculateHash(block) !== block.hash) throw BlockError('hash');
+	if (getDifficulty(block.hash) > difficulty) throw BlockError('difficulty');
 	return validateTransactions(block.transactions, unspent);
 };

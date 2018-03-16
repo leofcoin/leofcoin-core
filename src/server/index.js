@@ -6,6 +6,7 @@ import { encrypt, decrypt } from 'crypto-io-utils';
 import params from './../params';
 import wallet from './routes/wallet';
 import socketServer from './socket-server';
+import { chain } from '../lib/dagchain/dagchain-interface';
 // internal server for communicating with system fs
 const core = express();
 const server = Server(core);
@@ -20,7 +21,7 @@ core.use(cors({
 core.use(wallet);
 
 core.get('/core/chain', (request, response) => {
-	response.status(200).send(JSON.stringify(global.chain));
+	response.status(200).send(JSON.stringify(chain));
 });
 
 server.listen(5005, console.log('listening on 5005'));

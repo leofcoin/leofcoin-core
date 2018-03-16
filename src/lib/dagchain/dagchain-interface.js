@@ -4,7 +4,9 @@ import { TransactionError } from './../errors.js';
 import { multihashFromHex } from './../../utils';
 import { DAGBlock } from './dagblock';
 
-export const chain = (() => [])();
+global.chain = [];
+
+export const chain = (() => global.chain)();
 
 export const mempool = (() => [])();
 
@@ -77,7 +79,6 @@ export const difficulty = () => {
 	} else if (blocksMedian > 10){
 		blocksMedian = blocksMedian + 1.5;
 	}
-	console.log('median', blocksMedian);
 	return 10000 / (10 / blocksMedian); // should result in a block every 10 seconds
 };
 

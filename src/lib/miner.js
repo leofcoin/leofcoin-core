@@ -1,4 +1,4 @@
-import { config, debug, getDifficulty, hashLog, median } from './../utils';
+import { config, getDifficulty, hashLog, median } from './../utils';
 import { BlockError, TransactionError, MinerWarning } from './errors';
 import { StoreHandler } from 'crypto-store';
 import { nextBlock, difficulty } from './dagchain/dagchain-interface';
@@ -23,7 +23,6 @@ export default class Miner extends StoreHandler {
     }
     this.address = 'oaJWsPm7kGrvmvxhW4qQZtMi2DyK7DTcru';
     this.running = 0;
-    this.intensity = intensity;
 
 
     if (autostart) {
@@ -55,10 +54,9 @@ export default class Miner extends StoreHandler {
 
 
   async start() {
+    // ipfs.pubsub.subscribe('invalid-block');
     this.mining = true;
-    for (var i = 0; i < this.intensity; i++) {
-      this.mine(Math.random().toString(36).slice(-11));
-    }
+    this.mine(Math.random().toString(36).slice(-11));
   }
 
   stop() {
@@ -67,14 +65,9 @@ export default class Miner extends StoreHandler {
   }
 
   async mine(job, lastValidBlock) {
-    if (this.running >= this.intensity) {
-      bus.emit('job-cancelled', job);
-      return;
-    }
-    this.running++;
     const address = this.address || this.donationAddress;
     const start = Date.now();
-    const {block, hashes} = await this.mineBlock(difficulty(), address);
+    const {block, hashes, index} = await this.mineBlock(difficulty(), address, job);
 
     if (hashes) {
       const now = Date.now();
@@ -83,17 +76,16 @@ export default class Miner extends StoreHandler {
       bus.emit('hashrate', {uid: job, hashrate: (Math.round(rate * 100) / 100)});
     }
 
-
-
     if (block) {
       ipfs.pubsub.publish('block-added', new Buffer(JSON.stringify(block)));
-      this.running--;
+      console.log(`${job}::Whooooop mined block ${block.index}`);
       if (this.mining) {
-        this.mine(job, lastValidBlock);
+        await this.onBlockAdded();
+        this.mine(job, block);
       }
-    } else if (this.mining) {
-      this.running--;
-      this.mine(job);
+    } else {
+      console.log(`${job}::cancelled mining block ${index}`);
+      if (this.mining) this.mine(job);
     }
 
   }
@@ -107,9 +99,9 @@ export default class Miner extends StoreHandler {
    * @param address Addres for reward transaction
    * @return {*}
    */
-  async mineBlock(difficulty, address) {
+  async mineBlock(difficulty, address, job) {
     const block = await nextBlock(address);
-    debug(`Started mining block ${block.index}`)
+    console.log(`${job}::Started mining block ${block.index}`);
 
     return this.findBlockHash(block, difficulty);
   }
@@ -134,9 +126,8 @@ export default class Miner extends StoreHandler {
         */
       this.mineStop = () => {
        removeListeners()
-       debug('kill thread')
        worker.kill('SIGINT')
-       resolve({block: null, hashCount: null})
+       resolve({block: null, hashCount: null, index: block.index});
       }
 
       // Listeners for stopping mining

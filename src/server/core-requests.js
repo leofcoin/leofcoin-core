@@ -9,8 +9,6 @@ class CoreRequestError {
   }
 }
 
-const miner = new Miner();
-
 const readForResponse = (path, format) => new Promise(async (resolve, reject) => {
   const response = {};
   try {
@@ -33,8 +31,11 @@ const writeForResponse = (path, data) => new Promise(async (resolve, reject) => 
   resolve(response);
 });
 
+const miners = [];
+
 const handleMinerRequest = async ({name, params}) => {
   const response = {status: 409, data: null};
+
   try {
     switch (name) {
       case 'config':
@@ -44,18 +45,45 @@ const handleMinerRequest = async ({name, params}) => {
         break;
       case 'mine':
         const { address, intensity } = params;
+        const addMiner = count => {
+          for (var i = 0; i < count; i++) {
+            const miner = new Miner();
+            miner.address = address;
+            miners.push(new Miner());
+          }
+        }
+        if (!intensity) {
+          intensity = 1;
+        }
         if (!address) return console.warn('address undefined');
         if (params.mining) {
-          miner.address = address;
-          miner.intensity = intensity || 1;
-          if (!miner.mining) {
-            miner.start();
+          if (miners.length > 0 && miners.length === intensity) {
+            miners.forEach(miner => {
+              miner.address = address;
+            });
+          } else if (miners.length > intensity) {
+            const removeCount = miners.length - intensity
+            miners.slice(0, removeCount);
+          } else if (miners.length < intensity && miners.length > 0) {
+            const addCount = intensity - miners.length;
+            addMiner(addCount);
+          } else {
+            addMiner(intensity);
+          }
+
+          if (!miners.mining) {
+            miners.forEach(miner => {
+              miner.start();
+            });
+            miners.mining = true;
             global.states.mining = true
             bus.emit('mining', true);
           }
         } else {
-          miner.mining = false;
-          miner.stop();
+          miners.forEach(miner => {
+            miner.stop();
+          });
+          miners.mining = false;
           global.states.mining = false
           bus.emit('mining', false);
         }

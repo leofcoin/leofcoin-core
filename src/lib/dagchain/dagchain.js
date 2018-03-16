@@ -25,10 +25,11 @@ export class DAGChain extends EventEmitter {
   }
   get index() {
     const links = [];
-    for (const link of this.links) {
+    this.links.forEach(link => {
+
       links[link.name] = link;
-    }
-    return links.length > 0 ? links : null;
+    });
+    return links.length > 0 ? links : [];
   }
   constructor() {
     super();
@@ -56,7 +57,8 @@ export class DAGChain extends EventEmitter {
         this.loadChain();
       }
     } catch (e) {
-      this.newDAGChain();
+      console.error(e);
+      // this.newDAGChain();
     }
   }
   async resolve(name) {
@@ -72,7 +74,14 @@ export class DAGChain extends EventEmitter {
   }
 
   async pin(multihash) {
-    return await this.ipfs.pin.add(multihash);
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.ipfs.pin.add(multihash);
+        resolve();
+      } catch (e) {
+        reject(e)
+      }
+    });
   }
 
   /**
@@ -84,15 +93,19 @@ export class DAGChain extends EventEmitter {
   }
 
   async lastLink() {
-    await this.sync();
-    const height = Number(this.links.length) - 1;
-    for (const link of this.links) {
-      if (Number(link.name) === height) {
-        return link.multihash;
+    try {
+      await this.sync();
+      const height = Number(this.links.length) - 1;
+      for (const link of this.links) {
+        if (Number(link.name) === height) {
+          return link.multihash;
+        }
       }
+    } catch (e) {
+      console.error('Sync Error::', e);
     }
   }
-
+  // TODO: decentralize
   async lastBlock() {
     const lastLink = await this.lastLink();
     return await new DAGBlock(lastLink);
@@ -115,19 +128,26 @@ export class DAGChain extends EventEmitter {
   }
 
   async syncChain() {
-    bus.emit('syncing', true);
-    const { index, prevHash } = await this.localBlock();
-
-    if (this.index) {
-      for (const link of this.index) {
-        const block = await new DAGBlock(link.multihash);
-        if (index < block.index) {
-          await this.pin(encode(link.multihash));
-        }
-        this.addBlock(block);
+    try {
+      bus.emit('syncing', true);
+      if (this.index) {
+        const { index, prevHash } = await this.localBlock();
+        this.index.forEach(async link => {
+          const block = await new DAGBlock(link.multihash);
+          if (index < block.index) {
+            await this.pin(encode(link.multihash)); // pin block locally
+            await this.updateLocals(`1220${block.hash}`, block.index);
+            console.log(`added block: ${block.index}  ${block.hash}`);
+          }
+          this.chain[block.index] = block;
+          console.log(`loaded block: ${block.index}  ${block.hash}`);
+        });
       }
+      bus.emit('syncing', false);
+    } catch (e) {
+      console.error('syncChain', e);
     }
-    bus.emit('syncing', false);
+
   }
 
   async localBlock() {
@@ -145,6 +165,7 @@ export class DAGChain extends EventEmitter {
       }
     } catch (e) {
       const CID = await this.get(encode(new Buffer(genesis, 'hex')));
+      console.log(CID);
       await write(localCurrent, CID.multihash.toString('hex'));
       return await this.localBlock();
     }
@@ -156,26 +177,34 @@ export class DAGChain extends EventEmitter {
   }
 
   addBlock(block) {
-    this.chain.push(block);
-    global.chain = this.chain;
-    bus.emit('block-added', block);
-    console.log(`added block: ${block.index}`);
+    return new Promise(async (resolve, reject) => {
+      log(`add block: ${block.index}  ${block.hash}`);
+      this.chain[block.index] = block;
+      bus.emit('block-added', block);
+      await this.pin(multihashFromHex(block.hash)); // pin block locally
+      await this.updateLocals(`1220${block.hash}`, block.index);
+    });
+  }
+  // TODO: write using ipfs.files.write
+  writeLocals(CID, index) {
+    return new Promise(async (resolve, reject) => {
+      await write(localIndex, JSON.stringify(index));
+      await write(localCurrent, CID);
+      resolve();
+    });
   }
 
-  async writeLocals(CID, index) {
-    await write(localIndex, JSON.stringify(index));
-    await write(localCurrent, CID);
-    return;
-  }
-
-  async updateLocals(CID, height) {
-    try {
-      const index = await read(localIndex, 'json');
-      index.push([height, CID]);
-      return await this.writeLocals(CID, index);
-    } catch (error) {
-      return await this.writeLocals(CID, [[height, CID]]);
-    }
+  updateLocals(CID, height) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const index = await read(localIndex, 'json');
+        index.push([height, CID]);
+        await this.writeLocals(CID, index);
+      } catch (error) {
+        await this.writeLocals(CID, [[height, CID]]);
+      }
+      resolve();
+    });
   }
 
   /**
@@ -226,20 +255,23 @@ export class DAGChain extends EventEmitter {
   // TODO: validate on sync ...
   async announceBlock(announcement) {
     if (announcement.topicIDs[0] === 'block-added') {
+      const block = JSON.parse(announcement.data.toString());
       try {
-        const block = JSON.parse(announcement.data.toString());
         const lastBlock = await this.lastBlock();
+        const invalid = await validate(lastBlock, block, difficulty(), getUnspent());
+        if (invalid) {
+          ipfs.pubsub.publish('invalid-block', block);
+          bus.emit('invalid-block', block);
+        }
         await validate(lastBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
-        await this.sync();
+        // await this.sync();
         const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
-        await this.pin(encode(dagnode.multihash)); // pin block locally
-        const CID = dagnode.multihash.toString('hex'); // The CID as an base58 string
-        await this.updateLocals(CID, block.index);
         this.addBlock(block); // add to running chain
       } catch (error) {
+        ipfs.pubsub.publish('invalid-block', block);
         bus.emit('invalid-block', block);
-        return console.error(error)
+        return console.error(error);
       }
     }
   }
