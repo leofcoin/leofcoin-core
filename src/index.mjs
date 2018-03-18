@@ -6,7 +6,7 @@ import params from './params';
 import bus from './lib/bus';
 import './server/index';
 import { DAGChain } from './lib/dagchain/dagchain';
-import * as IPFS from 'ipfs-api';
+import IPFS from 'ipfs-api';
 import { connect } from './lib/network/peernet';
 global.CHAIN_CONFIG = params;
 const ipfs = new IPFS();
@@ -35,6 +35,8 @@ export const core = async ({ genesis, network }) => {
     bus.emit('stage-one');
 
     await loadDaemon();
+    const peers = await ipfs.swarm.peers();
+    console.log(peers);
     await connect([connection.address]);
     bus.emit('stage-two');
 

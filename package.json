@@ -52,7 +52,7 @@
         }
       },
       {
-        "src": "src/index.js",
+        "src": "src/index.mjs",
         "dest": "dist/core.js",
         "format": "cjs"
       },
@@ -103,11 +103,17 @@
     "websocket": "^1.0.25"
   },
   "devDependencies": {
+    "@std/esm": "^0.25.3",
     "eslint": "^4.17.0",
     "mocha": "^5.0.1",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.0.2",
     "tape": "^4.8.0"
+  },
+  "@std/esm": {
+    "mode": "js",
+    "cjs": true,
+    "await": true
   }
 }
