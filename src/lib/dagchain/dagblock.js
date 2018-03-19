@@ -1,9 +1,9 @@
 import { DAGNode } from 'ipld-dag-pb';
 import { validateTransactions, createRewardTransaction } from './../transaction';
 import { hexFromMultihash, getDifficulty } from './../../utils';
-import { isValid } from './../../schemas';
+import { isValid } from 'crypto-chain-validator';
 import { BlockError } from '../errors';
-import * as IPFS from 'ipfs-api';
+import IPFS from 'ipfs-api';
 const ipfs = new IPFS();
 
 export const calculateHash = async block => {
