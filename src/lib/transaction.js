@@ -1,6 +1,6 @@
 import { config } from './../utils';
 import params from '../params';
-import { isValid } from './../schemas.js';
+import { isValid } from 'crypto-chain-validator';
 import { TransactionError } from './errors.js';
 import { transactionInputHash, transactionHash } from './hash.js';
 import {chain, mempool} from './dagchain/dagchain';

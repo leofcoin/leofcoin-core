@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+"@std/esm@^0.25.3":
+  version "0.25.3"
+  resolved "https://registry.yarnpkg.com/@std/esm/-/esm-0.25.3.tgz#f211165c643b0fe29077428c4dcd0ce462a25d00"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -917,9 +921,15 @@ crypto-browserify@^3.11.0:
     randombytes "^2.0.0"
     randomfill "^1.0.3"
 
-crypto-daemon@^0.1.11:
-  version "0.1.11"
-  resolved "https://registry.yarnpkg.com/crypto-daemon/-/crypto-daemon-0.1.11.tgz#b4a7d5dff8e94dae6d0e2b6788d6245181c10221"
+crypto-chain-validator@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/crypto-chain-validator/-/crypto-chain-validator-0.1.0.tgz#82280b6ce579522a4d9ee0347a38a4ffb512c47c"
+  dependencies:
+    joi "^13.1.2"
+
+crypto-daemon@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/crypto-daemon/-/crypto-daemon-0.2.2.tgz#50d1a106d131116f0dddb16befa393945c32757d"
   dependencies:
     crypto-io-fs "^0.1.2"
     crypto-io-utils "^0.1.2"
@@ -3011,7 +3021,7 @@ joi@^11.1.0:
     isemail "3.x.x"
     topo "2.x.x"
 
-joi@^13.1.0:
+joi@^13.1.0, joi@^13.1.2:
   version "13.1.2"
   resolved "https://registry.yarnpkg.com/joi/-/joi-13.1.2.tgz#b2db260323cc7f919fafa51e09e2275bd089a97e"
   dependencies:

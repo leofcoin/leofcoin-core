@@ -83,6 +83,7 @@
     "bitcoinjs-lib": "^3.3.2",
     "bs58": "^4.0.1",
     "cors": "^2.8.4",
+    "crypto-chain-validator": "^0.1.0",
     "crypto-daemon": "^0.2.2",
     "crypto-ecdh": "^0.2.2",
     "crypto-io-fs": "^0.1.1",
