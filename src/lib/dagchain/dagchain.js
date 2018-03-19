@@ -1,6 +1,6 @@
 import { DAGNode } from 'ipld-dag-pb';
 import { decode, encode } from 'bs58';
-import * as IPFS from 'ipfs-api';
+import IPFS from 'ipfs-api';
 import EventEmitter from 'events';
 import { chain, difficulty, getUnspent } from './dagchain-interface';
 import { DAGBlock, createDAGNode, validate } from './dagblock';
@@ -46,7 +46,7 @@ export class DAGChain extends EventEmitter {
 
   async init() {
     try {
-      this.name = await this.resolve(dagchain);
+      this.name = await this.resolve(dagchain, {recursive: true});
       this.node = await this.get(this.link);
 
       if (process.argv[2] === 'genesis') {
@@ -62,7 +62,7 @@ export class DAGChain extends EventEmitter {
     }
   }
   async resolve(name) {
-    return await this.ipfs.name.resolve(name);
+    return await this.ipfs.name.resolve(name, {recursive: true});
   }
 
   async get(multihash) {
