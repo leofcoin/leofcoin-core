@@ -5,8 +5,7 @@ import { nextBlock, difficulty } from './dagchain/dagchain-interface';
 import bus from './bus';
 import { fork } from 'child_process';
 import { join } from 'path';
-// import { ipfs } from './dagchain/dagchain';
-import * as IPFS from 'ipfs-api'
+import IPFS from 'ipfs-api'
 const ipfs = new IPFS();
 
 export default class Miner extends StoreHandler {

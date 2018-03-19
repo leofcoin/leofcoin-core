@@ -17,10 +17,9 @@ export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
 
-export const dagchain = 'QmRGE6LpXchjcZM5h6grF7cftqPUho5yw5Uya5M8qQF9KG'; // QmPgX72kLV9Gopq77tMFAQfMZWBGp6Va3AFcmJyeQawTCm
+export const dagchain = 'ipfs.leofcoin.com';
 export const genesis = '122000001676d7bc4ad56642a63557ed6d81eb2107ca00b8db060d1cf32f53c92d52';
 export const checkpoints = [
-	'QmNLgJyShR2Nef3ncZKqTHxWVE1kvBWLpPDbPyQ9xfwfX3' // genesis block
 ];
 
 export default {

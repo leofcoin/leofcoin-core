@@ -1,6 +1,6 @@
 import { debug } from './../../utils';
 import bus from './../bus';
-import * as IPFS from 'ipfs-api';
+import IPFS from 'ipfs-api';
 import { join } from 'path';
 import { info, fail, succes } from 'crypto-logger';
 import { seeds } from '../../params';
