@@ -48,4 +48,4 @@ export const core = async ({ genesis, network }) => {
 	}
 }
 
-// export default core({genesis: false, network: 'leofcoin'})
+export default core({genesis: false, network: 'leofcoin'})

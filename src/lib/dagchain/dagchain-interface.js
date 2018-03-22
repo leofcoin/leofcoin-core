@@ -93,6 +93,11 @@ export const transformBlock = ({multihash, data}) => {
 export const lastBlock = async () => {
   const peers = await ipfs.swarm.peers(); // retrieve peerlist
   const stats = [];
+  // if (peers.length === null ) {
+
+    // const { id } = await ipfs.id();
+    // peers.push({peer: id})
+  // }
 
   for (const peer of peers) {
     try {
@@ -106,13 +111,12 @@ export const lastBlock = async () => {
       console.log(`Ignoring ${peer.peer.toB58String()}`)
     }
   }
-
   // reduce to longest chain
   // TODO: consider using canditates
   // canditates.push({hash, height})
   // if c.height > p.height => newCanditatesSet ...
   const stat = stats.reduce((p, c) => {
-    if (c.height > p.height) return c;
+    if (c.height > p.height || c.height === p.height) return c;
   }, {height: 0});
 
   const { links } = await ipfs.object.get(stat.hash); // retrieve links
