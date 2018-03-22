@@ -2,12 +2,12 @@ import { DAGNode } from 'ipld-dag-pb';
 import { decode, encode } from 'bs58';
 import IPFS from 'ipfs-api';
 import EventEmitter from 'events';
-import { chain, difficulty, getUnspent } from './dagchain-interface';
+import { chain, difficulty, getUnspent, longestChain } from './dagchain-interface';
 import { DAGBlock, createDAGNode, validate } from './dagblock';
 import { info, succes, log } from 'crypto-logger';
 import { read, write } from 'crypto-io-fs';
 import { join } from 'path';
-import { genesis, localIndex, localCurrent, dagchain } from './../../params';
+import { genesis, localIndex, localCurrent } from './../../params';
 import { debug, hashFromMultihash, multihashFromHex } from './../../utils';
 import bus from './../bus';
 
@@ -46,8 +46,9 @@ export class DAGChain extends EventEmitter {
 
   async init() {
     try {
-      this.name = await this.resolve(dagchain, {recursive: true});
-      this.node = await this.get(this.link);      
+      const { hash } = await longestChain();
+      this.name = hash;
+      this.node = await this.get(this.link);
       info(`Running on the ${process.argv[2]} network`);
       this.loadChain();
     } catch (e) {
@@ -111,7 +112,8 @@ export class DAGChain extends EventEmitter {
    * resolves to the latest chainObject
    */
   async sync() {
-    this.name = await this.resolve(dagchain);
+    const { hash } = await longestChain();
+    this.name = hash;
     this.node = await this.get(this.link);
     return this.link;
   }
@@ -247,13 +249,14 @@ export class DAGChain extends EventEmitter {
     return dagnode;
   }
 
-  // TODO: go with previeus block instead off lastBlock
+  // TODO: go with previous block instead off lastBlock
   // TODO: validate on sync ...
   async announceBlock(announcement) {
     if (announcement.topicIDs[0] === 'block-added') {
       const block = JSON.parse(announcement.data.toString());
       try {
-        const lastBlock = chain[chain.length - 1];
+        const lastBlock = await this.lastBlock(); // test
+        // const lastBlock = chain[chain.length - 1];
         const invalid = await validate(lastBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
         // await this.sync();

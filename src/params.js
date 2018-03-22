@@ -16,8 +16,6 @@ export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
-
-export const dagchain = 'ipfs.leofcoin.com';
 export const genesis = '122000001676d7bc4ad56642a63557ed6d81eb2107ca00b8db060d1cf32f53c92d52';
 export const checkpoints = [
 ];
@@ -30,7 +28,6 @@ export default {
 	localCurrent,
 	localIndex,
 	reward,
-	dagchain,
 	genesis,
 	consensusSubsidyInterval,
 	consensusSubsidyPercentage
