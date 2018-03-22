@@ -90,7 +90,7 @@ export const transformBlock = ({multihash, data}) => {
   return data;
 };
 
-export const lastBlock = async () => {
+export const longestChain = async () => {
   const peers = await ipfs.swarm.peers(); // retrieve peerlist
   const stats = [];
   // if (peers.length === null ) {
@@ -118,12 +118,16 @@ export const lastBlock = async () => {
   const stat = stats.reduce((p, c) => {
     if (c.height > p.height || c.height === p.height) return c;
   }, {height: 0});
+  return stat;
+}
 
-  const { links } = await ipfs.object.get(stat.hash); // retrieve links
+export const lastBlock = async () => {
+  const { hash, height } = await longestChain();
+  const { links } = await ipfs.object.get(hash); // retrieve links
   // TODO: syncChain if needed
   links.sort((a,b) => a.name - b.name); // sort index
   // get block using its ipfs ref
-  return await new DAGBlock(encode(links[stat.height].multihash));
+  return await new DAGBlock(encode(links[height].multihash));
 };
 
 export const nextBlock = async address => {
