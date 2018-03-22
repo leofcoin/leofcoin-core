@@ -253,19 +253,14 @@ export class DAGChain extends EventEmitter {
     if (announcement.topicIDs[0] === 'block-added') {
       const block = JSON.parse(announcement.data.toString());
       try {
-        const lastBlock = await this.lastBlock();
+        const lastBlock = chain[chain.length - 1];
         const invalid = await validate(lastBlock, block, difficulty(), getUnspent());
-        if (invalid) {
-          ipfs.pubsub.publish('invalid-block', block);
-          bus.emit('invalid-block', block);
-        }
-        await validate(lastBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
         // await this.sync();
         const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
         this.addBlock(block); // add to running chain
       } catch (error) {
-        ipfs.pubsub.publish('invalid-block', block);
+        ipfs.pubsub.publish('invalid-block', new Buffer.from(JSON.stringify(block)));
         bus.emit('invalid-block', block);
         return console.error(error);
       }
