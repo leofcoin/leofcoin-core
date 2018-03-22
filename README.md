@@ -14,6 +14,13 @@ Easy to use library containing our blockchain & some other handy dandy.
 Hardcoded to the Olivia (testnet) network untill further notice or even offial release.
 
 ## Developers
+### Starting core in devmode
+Never wait for builds again,
+install @std (local or global)
+then run 
+```sh
+npm run dev
+```
 ### Packaging core for browser
 When using core in the browser we need to package it with browserify, 
 this will give us a file containing our code with all the dependencies inline.

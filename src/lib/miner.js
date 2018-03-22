@@ -17,6 +17,8 @@ export default class Miner extends StoreHandler {
   constructor(address, intensity, autostart) {
     // TODO: limit intensity when pool is empty
     super();
+    if (process.versions.electron) this.workerPath = join(__dirname, 'lib/workers/miner-worker.js')
+    else this.workerPath = join(__dirname, 'workers/miner-worker.js')
     if (!address) {
       MinerWarning('All profit will be donated until address is set');
     }
@@ -114,7 +116,7 @@ export default class Miner extends StoreHandler {
    */
   findBlockHash (block, difficulty) {
     return new Promise((resolve, reject) => {
-      const worker = fork(join(__dirname, 'lib/workers/miner-worker.js'))
+      const worker = fork(this.workerPath);
       /*
        * Create worker to find hash in separate process
        */
