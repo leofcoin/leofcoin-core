@@ -68,7 +68,7 @@ export const connect = (addresses) => new Promise(async (resolve) => {
     // TODO: update reputations
     if (event.from !== id) console.log(event); // announcepeer
   });
-  await ipfs.pubsub.publish('peer-connected', new Buffer(id));
+  ipfs.pubsub.publish('peer-connected', new Buffer(id));
   bus.emit('connecting', false);
   resolve()
 })
