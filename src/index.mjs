@@ -35,8 +35,8 @@ export const core = async ({ genesis, network }) => {
     bus.emit('stage-one');
 
     await loadDaemon();
-    const peers = await ipfs.swarm.peers();
-    console.log(peers);
+    // const peers = await ipfs.swarm.peers();
+    // console.log(peers);
     await connect([connection.address]);
     bus.emit('stage-two');
 
@@ -48,4 +48,4 @@ export const core = async ({ genesis, network }) => {
 	}
 }
 
-export default core({genesis: false, network: 'leofcoin'})
+// export default core({genesis: false, network: 'leofcoin'})
