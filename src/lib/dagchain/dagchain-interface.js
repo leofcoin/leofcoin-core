@@ -95,12 +95,16 @@ export const lastBlock = async () => {
   const stats = [];
 
   for (const peer of peers) {
-    const ref = await ipfs.name.resolve(peer.peer.toB58String(), {recursive: true});
-    const hash = ref.replace('/ipfs/', '');
-    // get chain stats for every peer
-    const stat = await ipfs.object.stat(hash);
-    // push chain length & hash
-    stats.push({height: stat.NumLinks - 1, hash});
+    try {
+      const ref = await ipfs.name.resolve(peer.peer.toB58String(), {recursive: true});
+      const hash = ref.replace('/ipfs/', '');
+      // get chain stats for every peer
+      const stat = await ipfs.object.stat(hash);
+      // push chain length & hash
+      stats.push({height: stat.NumLinks - 1, hash});
+    } catch (e) {
+      console.log(`Ignoring ${peer.peer.toB58String()}`)
+    }
   }
 
   // reduce to longest chain
