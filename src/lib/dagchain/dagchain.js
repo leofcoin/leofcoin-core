@@ -47,18 +47,14 @@ export class DAGChain extends EventEmitter {
   async init() {
     try {
       this.name = await this.resolve(dagchain, {recursive: true});
-      this.node = await this.get(this.link);
-
+      this.node = await this.get(this.link);      
+      info(`Running on the ${process.argv[2]} network`);
+      this.loadChain();
+    } catch (e) {
       if (process.argv[2] === 'genesis') {
         info(`Creating ${process.argv[2]} block on the ${process.argv[3]} network`);
         this.newDAGChain();
-      } else {
-        info(`Running on the ${process.argv[2]} network`);
-        this.loadChain();
       }
-    } catch (e) {
-      console.error(e);
-      // this.newDAGChain();
     }
   }
   async resolve(name) {
