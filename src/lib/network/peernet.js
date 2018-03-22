@@ -50,7 +50,7 @@ export const _connect = async addresses => {
       timeout--;
       log(timeout + ' seconds');
       if (timeout === 0) {
-        await _connect(addresses);
+        return await _connect(addresses);
       }
     }, 1000);
   }
