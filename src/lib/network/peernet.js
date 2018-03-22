@@ -39,23 +39,17 @@ const handleDefaultBootstrapAddresses = async addresses => {
   }
 }
 
-export const _connect = async addresses => {
-  try {
-    await ipfs.swarm.connect(addresses);
-  } catch (e) {
-    fail(e.message);
-    info('trying again in')
-    let timeout = 3;
-    setInterval(async () => {
-      timeout--;
-      log(timeout + ' seconds');
-      if (timeout === 0) {
-        return await _connect(addresses);
-      }
-    }, 1000);
-  }
-  return;
-}
+export const _connect = async addresses =>
+  new Promise(async (resolve, reject) => {
+    try {
+      await ipfs.swarm.connect(addresses);
+      resolve();
+    } catch (e) {
+      fail(e.message);
+      info('trying again')
+      return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
+    }
+  });
 
 export const connect = (addresses) => new Promise(async (resolve) => {
   bus.emit('connecting', true);
