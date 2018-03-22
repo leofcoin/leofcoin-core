@@ -1,8 +1,10 @@
-import { config, median } from './../../utils';
+import { config, median, multihashFromHex } from './../../utils';
 import { validateTransaction } from './../transaction.js';
 import { TransactionError } from './../errors.js';
-import { multihashFromHex } from './../../utils';
 import { DAGBlock } from './dagblock';
+import { encode } from 'bs58';
+import IPFS from 'ipfs-api';
+const ipfs = new IPFS();
 
 global.chain = [];
 
@@ -60,7 +62,7 @@ export const getBalanceForAddress = address => {
 export const difficulty = () => {
 	// TODO: lower difficulty when transactionpool contain more then 500 tx ?
 	// TODO: raise difficulty when pool is empty
-	// get the last 504 blocks
+	// get the last 128 blocks
 	const start = chain.length >= 128 ? (chain.length - 128) : 0;
 	const blocks = chain.slice(start, (chain.length - 1)).reverse();
 	const stamps = [];
@@ -89,7 +91,31 @@ export const transformBlock = ({multihash, data}) => {
 };
 
 export const lastBlock = async () => {
-  return await new DAGBlock(multihashFromHex(chain[chain.length - 1].hash));
+  const peers = await ipfs.swarm.peers(); // retrieve peerlist
+  const stats = [];
+
+  for (const peer of peers) {
+    const ref = await ipfs.name.resolve(peer.peer.toB58String(), {recursive: true});
+    const hash = ref.replace('/ipfs/', '');
+    // get chain stats for every peer
+    const stat = await ipfs.object.stat(hash);
+    // push chain length & hash
+    stats.push({height: stat.NumLinks - 1, hash});
+  }
+
+  // reduce to longest chain
+  // TODO: consider using canditates
+  // canditates.push({hash, height})
+  // if c.height > p.height => newCanditatesSet ...
+  const stat = stats.reduce((p, c) => {
+    if (c.height > p.height) return c;
+  }, {height: 0});
+
+  const { links } = await ipfs.object.get(stat.hash); // retrieve links
+  // TODO: syncChain if needed
+  links.sort((a,b) => a.name - b.name); // sort index
+  // get block using its ipfs ref
+  return await new DAGBlock(encode(links[stat.height].multihash));
 };
 
 export const nextBlock = async address => {
