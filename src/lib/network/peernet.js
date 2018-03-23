@@ -55,10 +55,13 @@ export const connect = (addresses) => new Promise(async (resolve) => {
   bus.emit('connecting', true);
   debug(info('connecting peers'));
   const { id } = await ipfs.id();
+  // TODO: filter using peerrep
   addresses = addresses.map(address => {
     if(!address.includes(id)) return address
   });
-  await handleDefaultBootstrapAddresses(addresses);
+  await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
+  const peers = await ipfs.swarm.peers();
+  peers.forEach(({addr}) => addresses.push(addr));
   if (addresses) {
     await _connect(addresses)
   }
