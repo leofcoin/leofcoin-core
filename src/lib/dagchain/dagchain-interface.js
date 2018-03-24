@@ -101,7 +101,7 @@ export const longestChain = async () => {
 
   for (const peer of peers) {
     try {
-      const ref = await ipfs.name.resolve(peer.peer.toB58String(), {recursive: true});
+      const ref = await ipfs.name.resolve(peer.peer.toB58String());
       const hash = ref.replace('/ipfs/', '');
       // get chain stats for every peer
       const stat = await ipfs.object.stat(hash);
@@ -132,6 +132,6 @@ export const lastBlock = async () => {
 
 export const nextBlock = async address => {
   const transactions = nextBlockTransactions();
-  const previousBlock = await lastBlock();
+  const previousBlock = chain[chain.length - 1];
   return await new DAGBlock({transactions, previousBlock, address});
 };

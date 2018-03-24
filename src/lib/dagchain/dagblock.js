@@ -43,7 +43,7 @@ export class DAGBlock {
 		else return this.get(options);
 	}
 
-	newBlock({transactions, previousBlock, address}) {
+	async newBlock({transactions, previousBlock, address}) {
 		transactions = transactions.slice();
 		transactions.push(createRewardTransaction(address, previousBlock.index + 1));
 		this.data = {
@@ -53,7 +53,7 @@ export class DAGBlock {
 			transactions,
 			nonce: 0
 		};
-		this.data.hash = calculateHash(this.data);
+		this.data.hash = await calculateHash(this.data);
 		return this.data;
 	}
 	transformBlock({multihash, data}) {
