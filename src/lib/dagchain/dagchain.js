@@ -2,7 +2,7 @@ import { DAGNode } from 'ipld-dag-pb';
 import { decode, encode } from 'bs58';
 import IPFS from 'ipfs-api';
 import EventEmitter from 'events';
-import { chain, difficulty, getUnspent, longestChain } from './dagchain-interface';
+import { chain, difficulty, getUnspent, longestChain, lastBlock } from './dagchain-interface';
 import { DAGBlock, createDAGNode, validate } from './dagblock';
 import { info, succes, log } from 'crypto-logger';
 import { read, write } from 'crypto-io-fs';
@@ -140,7 +140,9 @@ export class DAGChain extends EventEmitter {
           this.chain[block.index] = block;
           console.log(`loaded block: ${block.index}  ${block.hash}`);
         });
-      }
+      } // else {
+        // const { index, prevHash } = await this.localBlock();
+      // }
       bus.emit('syncing', false);
     } catch (e) {
       console.error('syncChain', e);
@@ -255,11 +257,11 @@ export class DAGChain extends EventEmitter {
     if (announcement.topicIDs[0] === 'block-added') {
       const block = JSON.parse(announcement.data.toString());
       try {
-        const lastBlock = await this.lastBlock(); // test
-        // const lastBlock = chain[chain.length - 1];
-        const invalid = await validate(lastBlock, block, difficulty(), getUnspent());
+        // const previousBlock = await lastBlock(); // test
+        const previousBlock = chain[chain.length - 1];
+        const invalid = await validate(previousBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
-        // await this.sync();
+        await this.sync();
         const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
         this.addBlock(block); // add to running chain
       } catch (error) {
