@@ -39,6 +39,22 @@ const handleDefaultBootstrapAddresses = async addresses => {
   }
 }
 
+let done = false;
+let runs = 0
+export const resolvePeers = () => new Promise(resolve => {
+  if (runs === 5) {
+    info('searched for peers but none found, returning empty array');
+    return resolve([]);
+  }
+  const resolves = peers => {
+    done = true;
+    resolve(peers);
+  }
+  ipfs.swarm.peers().then(peers => resolves(peers));
+  runs++;
+  if (!done) setTimeout(() => resolvePeers().then(peers => resolves(peers)), 3000);
+})
+
 export const _connect = async addresses =>
   new Promise(async (resolve, reject) => {
     try {
@@ -60,7 +76,7 @@ export const connect = (addresses) => new Promise(async (resolve) => {
     if(!address.includes(id)) return address
   });
   await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
-  const peers = await ipfs.swarm.peers();
+  const peers = await resolvePeers();
   peers.forEach(({addr}) => addresses.push(addr));
   if (addresses) {
     await _connect(addresses)
