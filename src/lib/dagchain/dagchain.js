@@ -52,6 +52,7 @@ export class DAGChain extends EventEmitter {
       info(`Running on the ${process.argv[2]} network`);
       this.loadChain();
     } catch (e) {
+      // TODO: finishe the genesis module
       if (process.argv[2] === 'genesis') {
         info(`Creating ${process.argv[2]} block on the ${process.argv[3]} network`);
         this.newDAGChain();
@@ -137,7 +138,7 @@ export class DAGChain extends EventEmitter {
             await this.updateLocals(`1220${block.hash}`, block.index);
             console.log(`added block: ${block.index}  ${block.hash}`);
           }
-          this.chain[block.index] = block;
+          chain[block.index] = block;
           console.log(`loaded block: ${block.index}  ${block.hash}`);
         });
       } // else {
@@ -179,7 +180,7 @@ export class DAGChain extends EventEmitter {
   addBlock(block) {
     return new Promise(async (resolve, reject) => {
       log(`add block: ${block.index}  ${block.hash}`);
-      this.chain[block.index] = block;
+      chain[block.index] = block;
       bus.emit('block-added', block);
       await this.pin(multihashFromHex(block.hash)); // pin block locally
       await this.updateLocals(`1220${block.hash}`, block.index);
@@ -253,22 +254,21 @@ export class DAGChain extends EventEmitter {
 
   // TODO: go with previous block instead off lastBlock
   // TODO: validate on sync ...
-  async announceBlock(announcement) {
-    if (announcement.topicIDs[0] === 'block-added') {
-      const block = JSON.parse(announcement.data.toString());
+  async announceBlock({data, from}) {
+      const block = JSON.parse(data.toString());
       try {
         // const previousBlock = await lastBlock(); // test
         const previousBlock = chain[chain.length - 1];
         const invalid = await validate(previousBlock, block, difficulty(), getUnspent());
         const dagnode = await new DAGBlock().put(block);
-        await this.sync();
+        // await this.sync();
         const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
-        this.addBlock(block); // add to running chain
+        this.addBlock(block); // add to chain
       } catch (error) {
+        // TODO: remove publish invalid-block
         ipfs.pubsub.publish('invalid-block', new Buffer.from(JSON.stringify(block)));
         bus.emit('invalid-block', block);
         return console.error(error);
       }
     }
-  }
 }

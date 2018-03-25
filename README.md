@@ -13,6 +13,11 @@ Easy to use library containing our blockchain & some other handy dandy.
 ## Info
 Hardcoded to the Olivia (testnet) network untill further notice or even offial release.
 
+## How does it work
+- starts daemon
+- gui waits 15 seconds for peer connections before continueing when none found
+- searches the longest chain and starts syncing using the chain.links names (block hashes)
+
 ## Developers
 ### Starting core in devmode
 Never wait for builds again,
@@ -56,9 +61,14 @@ npm run start
 - GPU mining support
 - Multi wallet support
 - HD addresses
+- Ignore masterseed when its offline (the peer bootstrap contains default and reputationed* peer addresses)
+
+
+\*reputationed: Peers are sorted by their reputation (time online, blockshares, bandwidth, etc)
 
 
 ## Projects using leofcoin-core
+
 #### Community
 -
 
@@ -70,4 +80,4 @@ Projects made by crypto-io, contains wallet, paperWallet, miner etc
 
 ## License
 
-MIT © [Leofcoin](https://github.com/leofcoin);
+MIT © [Leofcoin](https://github.com/leofcoin)
