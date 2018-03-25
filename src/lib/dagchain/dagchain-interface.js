@@ -91,7 +91,10 @@ export const transformBlock = ({multihash, data}) => {
 };
 
 export const longestChain = async () => {
-  const peers = await ipfs.swarm.peers(); // retrieve peerlist
+  const { id } = await ipfs.id()
+  let peers = await ipfs.swarm.peers(); // retrieve peerlist
+  peers.map(({ peer }) => peer.toB58String());
+  peers.push(id);
   const stats = [];
   // if (peers.length === null ) {
 
@@ -101,7 +104,7 @@ export const longestChain = async () => {
 
   for (const peer of peers) {
     try {
-      const ref = await ipfs.name.resolve(peer.peer.toB58String());
+      const ref = await ipfs.name.resolve(peer);
       const hash = ref.replace('/ipfs/', '');
       // get chain stats for every peer
       const stat = await ipfs.object.stat(hash);
@@ -117,7 +120,7 @@ export const longestChain = async () => {
   // if c.height > p.height => newCanditatesSet ...
   const stat = stats.reduce((p, c) => {
     if (c.height > p.height || c.height === p.height) return c;
-  }, {height: 0});
+  }, {height: 0, hash: null});
   return stat;
 }
 
