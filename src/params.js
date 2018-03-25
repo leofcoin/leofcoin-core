@@ -16,7 +16,7 @@ export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
-export const genesis = '122000001676d7bc4ad56642a63557ed6d81eb2107ca00b8db060d1cf32f53c92d52';
+export const genesis = '12200000090a851713699f76a68d7b19f52c8f5c7da8a9e217de7447766a18cda19c';
 export const checkpoints = [
 ];
 

@@ -81,6 +81,8 @@ export const difficulty = () => {
 	} else if (blocksMedian > 10){
 		blocksMedian = blocksMedian + 1.5;
 	}
+  console.log(`Average Block Time: ${blocksMedian}`);
+  console.log(`Difficulty: ${10 / blocksMedian}`);
 	return 10000 / (10 / blocksMedian); // should result in a block every 10 seconds
 };
 
@@ -93,15 +95,9 @@ export const transformBlock = ({multihash, data}) => {
 export const longestChain = async () => {
   const { id } = await ipfs.id()
   let peers = await ipfs.swarm.peers(); // retrieve peerlist
-  peers.map(({ peer }) => peer.toB58String());
+  peers = peers.map(({ peer }) => peer.toB58String());
   peers.push(id);
   const stats = [];
-  // if (peers.length === null ) {
-
-    // const { id } = await ipfs.id();
-    // peers.push({peer: id})
-  // }
-
   for (const peer of peers) {
     try {
       const ref = await ipfs.name.resolve(peer);
@@ -109,17 +105,18 @@ export const longestChain = async () => {
       // get chain stats for every peer
       const stat = await ipfs.object.stat(hash);
       // push chain length & hash
-      stats.push({height: stat.NumLinks - 1, hash});
+      stats.push({height: stat.NumLinks - 1, hash: stat.Hash});
     } catch (e) {
-      console.log(`Ignoring ${peer.peer.toB58String()}`)
+      console.log(`Ignoring ${peer}`)
     }
   }
   // reduce to longest chain
-  // TODO: consider using canditates
+  // TODO: consider using canditates for validating
   // canditates.push({hash, height})
   // if c.height > p.height => newCanditatesSet ...
   const stat = stats.reduce((p, c) => {
     if (c.height > p.height || c.height === p.height) return c;
+    else return p;
   }, {height: 0, hash: null});
   return stat;
 }

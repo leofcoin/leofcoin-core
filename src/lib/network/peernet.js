@@ -78,7 +78,7 @@ export const connect = (addresses) => new Promise(async (resolve) => {
   await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
   const peers = await resolvePeers();
   peers.forEach(({addr}) => addresses.push(addr));
-  if (addresses) {
+  if (addresses && peers.length !== 0) {
     await _connect(addresses)
   }
   debug(succes(`connected to ${addresses.length} peers`));
