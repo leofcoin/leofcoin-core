@@ -75,11 +75,12 @@ export const difficulty = () => {
 		stamps.push(10);
 	}
 	let blocksMedian = median(stamps) || 10;
+  const offset = blocksMedian / 10
    // offset for quick recovery
-	if (blocksMedian < 10) {
-		blocksMedian = blocksMedian - 1.5;
-	} else if (blocksMedian > 10){
-		blocksMedian = blocksMedian + 1.5;
+	if (blocksMedian < 9) {
+		blocksMedian -= offset;
+	} else if (blocksMedian > 11) {
+		blocksMedian += offset;
 	}
   console.log(`Average Block Time: ${blocksMedian}`);
   console.log(`Difficulty: ${10 / blocksMedian}`);
