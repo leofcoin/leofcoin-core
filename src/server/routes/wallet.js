@@ -11,10 +11,10 @@ const router = Router();
 const APPDATAPATH = (() => {
   switch (process.platform) {
     case 'win32':
-      return join(homedir(), 'AppData', 'Roaming', 'Cryptocoin')
+      return join(homedir(), 'AppData', 'Roaming', 'Leofcoin')
       break;
     case 'linux':
-      return join(homedir(), 'Cryptocoin')
+      return join(homedir(), '.leofcoin')
       break;
     case 'darwin':
       // TODO: implement darwin path
@@ -87,7 +87,6 @@ router.get('/core/addresses', async (request, response) => {
 router.get('/core/getbalance/:address', async (request, response) => {
   try {
     const balance = getBalanceForAddress(request.params.address);
-    console.log(balance);
     response.status(200).send(String(balance))
   } catch (error) {
     response.status(409).send(error);

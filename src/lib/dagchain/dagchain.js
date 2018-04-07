@@ -1,24 +1,23 @@
 import { DAGNode } from 'ipld-dag-pb';
 import { decode, encode } from 'bs58';
-import IPFS from 'ipfs-api';
 import EventEmitter from 'events';
 import { chain, difficulty, getUnspent, longestChain, lastBlock } from './dagchain-interface';
 import { DAGBlock, createDAGNode, validate } from './dagblock';
-import { info, succes, log } from 'crypto-logger';
 import { read, write } from 'crypto-io-fs';
 import { join } from 'path';
-import { genesis, localIndex, localCurrent } from './../../params';
-import { debug, hashFromMultihash, multihashFromHex } from './../../utils';
+import { genesis, genesisCID, localIndex, localCurrent, networks } from './../../params';
+import { debug, hashFromMultihash, multihashFromHex, succes, log } from './../../utils';
 import bus from './../bus';
-
+import IPFS from 'ipfs-api';
+const ipfs = new IPFS();
 // import ipfsKeepAlive from './../../ipfs-keep-alive';
 // import bitswap from 'ipfs-bitswap';
 // TODO: implement bitswap
-export const ipfs = (() => new IPFS())();
+// export const ipfs = (() => new IPFS())();
 
 export class DAGChain extends EventEmitter {
   get link() {
-    return this.name.replace('/ipfs/', '');
+    return this.name.replace('/ipfs/', '')
   }
   get links() {
     return this.node ? this.node.links : [];
@@ -31,33 +30,34 @@ export class DAGChain extends EventEmitter {
     });
     return links.length > 0 ? links : [];
   }
-  constructor() {
+  constructor({network, genesis}) {
     super();
     this.announceBlock = this.announceBlock.bind(this);
 
     this.chain = chain;
     this.ipfs = ipfs;
 
-    this.ipfs.pubsub.subscribe('block-added', this.announceBlock);
-
-    this.init();
-    // ipfsKeepAlive(params.dagchain);
   }
 
-  async init() {
-    try {
-      const { hash } = await longestChain();
-      this.name = hash;
-      this.node = await this.get(this.link);
-      info(`Running on the ${process.argv[2]} network`);
-      this.loadChain();
-    } catch (e) {
-      // TODO: finishe the genesis module
-      if (process.argv[2] === 'genesis') {
-        info(`Creating ${process.argv[2]} block on the ${process.argv[3]} network`);
-        this.newDAGChain();
+  init() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await this.ipfs.pubsub.subscribe('block-added', this.announceBlock);
+        const { hash } = await longestChain();
+        this.name = hash;
+        this.node = await this.get(this.link);
+        log(`Running on the ${process.argv[2]} network`);
+        await this.loadChain();
+      } catch (error) {
+        // TODO: finishe the genesis module
+        if (process.argv[2] === 'genesis') {
+          log(`Creating ${process.argv[2]} block on the ${process.argv[3]} network`);
+          await this.newDAGChain();
+        } else {
+          reject(error)
+        }
       }
-    }
+    });
   }
   async resolve(name) {
     return await this.ipfs.name.resolve(name, {recursive: true});
@@ -165,8 +165,7 @@ export class DAGChain extends EventEmitter {
         CID
       }
     } catch (e) {
-      const CID = await this.get(encode(new Buffer(genesis, 'hex')));
-      console.log(CID);
+      const CID = await this.get(encode(new Buffer(genesisCID, 'hex')));
       await write(localCurrent, CID.multihash.toString('hex'));
       return await this.localBlock();
     }
@@ -216,17 +215,23 @@ export class DAGChain extends EventEmitter {
    * @setup PART of Easy setup your own blockchain, more info URL...
    */
   async newDAGChain() {
-    const genesisDAGNode = await this.newGenesisDAGNode(difficulty());
-    const block = await this.put(genesisDAGNode);
-    await this.pin(encode(block.multihash));
-    const chainDAG = await this.ipfs.object.new('unixfs-dir');
-    const height = JSON.parse(genesisDAGNode.data.toString()).index;
-    const updated = await this.addLink(chainDAG.multihash, {name: height, size: block.size, multihash: block.multihash});
-    const CID = block.multihash.toString('hex'); // The CID as an base58 string
-    await this.updateLocals(CID, height);
-    succes('dag chain created');
-    info(`DAGChain name ${updated}`);
-    info(`Genesis ${CID}`);
+    try {
+      const genesisDAGNode = await this.newGenesisDAGNode(difficulty());
+      const block = await this.put(genesisDAGNode);
+      console.log(block);
+      await this.pin(encode(block.multihash));
+      console.log('pinned');
+      const chainDAG = await this.ipfs.object.new('unixfs-dir');
+      const height = JSON.parse(genesisDAGNode.data.toString()).index;
+      const updated = await this.addLink(chainDAG.multihash, {name: height, size: block.size, multihash: block.multihash});
+      const CID = block.multihash.toString('hex'); // The CID as an base58 string
+      await this.updateLocals(CID, height);
+      succes('dag chain created');
+      log(`DAGChain name ${updated}`);
+      log(`Genesis ${CID}`);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /**
