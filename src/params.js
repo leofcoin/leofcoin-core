@@ -8,7 +8,6 @@ const args = process.argv.forEach(arg => {
 	if (arg === 'olivia' || arg === 'testnet') olivia = true;
 	if (arg === 'genesis') genesis = true;
 });
-console.log(olivia);
 
 // TODO: finish multiple network support (setup multiple repos etc) see issue #6
 export const networks = {

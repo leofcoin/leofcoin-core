@@ -93,7 +93,6 @@
     "express": "^4.16.3",
     "fs-ext": "^1.0.0",
     "go-ipfs-dep": "^0.4.14",
-    "gpu.js": "^1.0.0",
     "ip-monitor": "^0.1.2",
     "ipfs": "^0.27.7",
     "ipfs-bitswap": "^0.19.0",
