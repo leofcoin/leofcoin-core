@@ -96,7 +96,8 @@ export const transformBlock = ({multihash, data}) => {
 // TODO: global peerlist
 export const longestChain = () => new Promise(async (resolve, reject) => {
   try {
-    const { id } = await ipfs.id()
+    const { id } = await ipfs.id();
+    console.log(id);
     let peers = await ipfs.swarm.peers(); // retrieve peerlist
     peers = peers.map(({ peer, addr }) => {return {id: peer.toB58String(), addr: addr.toString()}});
     // peers.push(id);

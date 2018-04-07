@@ -44,6 +44,7 @@ export class DAGChain extends EventEmitter {
       try {
         await this.ipfs.pubsub.subscribe('block-added', this.announceBlock);
         const { hash } = await longestChain();
+        console.log(hash);
         this.name = hash;
         this.node = await this.get(this.link);
         log(`Running on the ${process.argv[2]} network`);
