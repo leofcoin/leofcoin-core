@@ -1,14 +1,12 @@
-import { debug } from './../../utils';
+import { debug, fail, succes } from './../../utils';
 import bus from './../bus';
-import IPFS from 'ipfs-api';
 import { join } from 'path';
-import { info, fail, succes, log } from 'crypto-logger';
 import { seeds } from '../../params';
 import { DAGNode } from 'ipld-dag-pb';
 import { encode } from 'bs58';
 const { promisify } = require('util');
+import ipfs from './ipfs-mock';
 
-export const ipfs = new IPFS();
 // TODO: create bootstrap according peer reputation ...
 const handleDefaultBootstrapAddresses = async addresses => {
   try {
@@ -34,7 +32,6 @@ const handleDefaultBootstrapAddresses = async addresses => {
     await ipfs.config.set('Bootstrap', bootstrap);
     return 0;
   } catch (error) {
-    console.error(error);
     return 1;
   }
 }
@@ -43,7 +40,7 @@ let done = false;
 let runs = 0
 export const resolvePeers = () => new Promise(resolve => {
   if (runs === 5) {
-    info('searched for peers but none found, returning empty array');
+    debug('searched for peers but none found, returning empty array');
     return resolve([]);
   }
   const resolves = peers => {
@@ -62,32 +59,36 @@ export const _connect = async addresses =>
       resolve();
     } catch (e) {
       fail(e.message);
-      info('trying again')
+      debug('trying again')
       return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
     }
   });
+export const connect = (addresses) => new Promise(async (resolve, reject) => {
+  try {
+    bus.emit('connecting', true);
+    debug('connecting peers');
+    const { id } = await ipfs.id();
+    // TODO: filter using peerrep
+    addresses = addresses.map(address => {
+      if(!address.includes(id)) return address
+    });
+    await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
+    const peers = await resolvePeers();
+    // transform peers into valid ipfs addresses
+    peers.forEach(({addr, peer}) => addresses.push(`${addr.toString()}/ipfs/${peer.toB58String()}`));
+    if (addresses) {
+      await _connect(addresses)
+    }
+    succes(`connected to ${addresses.length - 1} peers`);
 
-export const connect = (addresses) => new Promise(async (resolve) => {
-  bus.emit('connecting', true);
-  debug(info('connecting peers'));
-  const { id } = await ipfs.id();
-  // TODO: filter using peerrep
-  addresses = addresses.map(address => {
-    if(!address.includes(id)) return address
-  });
-  await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
-  const peers = await resolvePeers();
-  peers.forEach(({addr}) => addresses.push(addr));
-  if (addresses && peers.length !== 0) {
-    await _connect(addresses)
+    ipfs.pubsub.subscribe('peer-connected', event => {
+      // TODO: update reputations
+      if (event.from !== id) console.log(event); // announcepeer
+    });
+    ipfs.pubsub.publish('peer-connected', new Buffer(id));
+    bus.emit('connecting', false);
+    resolve();
+  } catch (e) {
+    reject(e)
   }
-  debug(succes(`connected to ${addresses.length} peers`));
-
-  ipfs.pubsub.subscribe('peer-connected', event => {
-    // TODO: update reputations
-    if (event.from !== id) console.log(event); // announcepeer
-  });
-  ipfs.pubsub.publish('peer-connected', new Buffer(id));
-  bus.emit('connecting', false);
-  resolve()
 })

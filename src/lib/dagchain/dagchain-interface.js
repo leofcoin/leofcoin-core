@@ -4,7 +4,7 @@ import { TransactionError } from './../errors.js';
 import { DAGBlock } from './dagblock';
 import { encode } from 'bs58';
 import IPFS from 'ipfs-api';
-const ipfs = new IPFS();
+const ipfs = new IPFS()
 
 global.chain = [];
 
@@ -93,34 +93,43 @@ export const transformBlock = ({multihash, data}) => {
   return data;
 };
 
-export const longestChain = async () => {
-  const { id } = await ipfs.id()
-  let peers = await ipfs.swarm.peers(); // retrieve peerlist
-  peers = peers.map(({ peer }) => peer.toB58String());
-  peers.push(id);
-  const stats = [];
-  for (const peer of peers) {
-    try {
-      const ref = await ipfs.name.resolve(peer);
-      const hash = ref.replace('/ipfs/', '');
-      // get chain stats for every peer
-      const stat = await ipfs.object.stat(hash);
-      // push chain length & hash
-      stats.push({height: stat.NumLinks - 1, hash: stat.Hash});
-    } catch (e) {
-      console.log(`Ignoring ${peer}`)
+// TODO: global peerlist
+export const longestChain = () => new Promise(async (resolve, reject) => {
+  try {
+    const { id } = await ipfs.id()
+    let peers = await ipfs.swarm.peers(); // retrieve peerlist
+    peers = peers.map(({ peer, addr }) => {return {id: peer.toB58String(), addr: addr.toString()}});
+    // peers.push(id);
+    const stats = [];
+    for (const {addr, id} of peers) {
+      try {
+        const con = await ipfs.swarm.connect(`${addr}/ipfs/${id}`);
+        const ref = await ipfs.name.resolve(id, {recursive: true});
+        const hash = ref.replace('/ipfs/', '');
+        // get chain stats for every peer
+        const stat = await ipfs.object.stat(hash);
+        // push chain length & hash
+        stats.push({height: stat.NumLinks - 1, hash: stat.Hash});
+      } catch (e) {
+        if (e.code === 'ECONNREFUSED') {
+          reject(e);
+        }
+        console.log(`Ignoring ${id}`)
+      }
     }
+    // reduce to longest chain
+    // TODO: consider using canditates for validating
+    // canditates.push({hash, height})
+    // if c.height > p.height => newCanditatesSet ...
+    const stat = stats.reduce((p, c) => {
+      if (c.height > p.height || c.height === p.height) return c;
+      else return p;
+    }, {height: 0, hash: null});
+    resolve(stat);
+  } catch (e) {
+    reject(e)
   }
-  // reduce to longest chain
-  // TODO: consider using canditates for validating
-  // canditates.push({hash, height})
-  // if c.height > p.height => newCanditatesSet ...
-  const stat = stats.reduce((p, c) => {
-    if (c.height > p.height || c.height === p.height) return c;
-    else return p;
-  }, {height: 0, hash: null});
-  return stat;
-}
+});
 
 export const lastBlock = async () => {
   const { hash, height } = await longestChain();

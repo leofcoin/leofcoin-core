@@ -1,7 +1,40 @@
 'use strict';
 import { read, write } from 'crypto-io-fs';
-import { bootstrap, configPath } from './params';
+import { bootstrap, configPath, olivia } from './params';
 import { encode } from 'bs58';
+import CryptoWallet from './lib/wallet';
+import chalk from 'chalk';
+import { homedir } from 'os';
+import { join } from 'path';
+
+if (process.platform === 'win32') {
+  const readLine = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  readLine.on('SIGINT', () => {
+    process.emit('SIGINT');
+  });
+};
+
+const APPDATAPATH = (() => {
+  switch (process.platform) {
+    case 'win32':
+      return join(homedir(), 'AppData', 'Roaming', 'Leofcoin', olivia ? 'olivia' : '')
+      break;
+    case 'linux':
+      return join(homedir(), '.leofcoin', olivia ? 'olivia' : '')
+      break;
+    case 'darwin':
+      // TODO: implement darwin path
+      break;
+    case 'android':
+      // TODO: implement android path
+      // experimental
+      break;
+  }
+})();
 
 // hardcode debug param for now
 process.env.DEBUG = true;
@@ -9,9 +42,23 @@ export const debug = (text) => {
 	if (process.env.DEBUG) {
     const stack = new Error().stack;
     const caller = stack.split('\n')[2].trim();
-    console.log(`${process.env.verbose ? caller + '::' : ''}${text}`);
+    console.groupCollapsed(chalk.blue(text));
+    console.log(caller)
+    console.groupEnd();
   };
 };
+
+export const log = text => {
+  console.log(chalk.cyan(text));
+}
+
+export const succes = text => {
+  console.log(chalk.green(text));
+}
+
+export const fail = text => {
+  console.log(chalk.red(text));
+}
 /**
  * Get hash difficulty
  *
@@ -105,11 +152,53 @@ export const config = {
 	peers: []
 };
 
-export const networkAddress = net => {
-	if (net === 'olivia') {
-		return 'oaJWsPm7kGrvmvxhW4qQZtMi2DyK7DTcru';
-	}
-	return '';
+
+export const newWallet = ( name= 'main') => new Promise(async (resolve, reject) => {
+  try {
+    const wallet = new CryptoWallet(olivia ? 'olivia' : 'leofcoin');
+    wallet.new();
+    const addresses = JSON.stringify([[name, wallet.public]]);
+    await write(join(APPDATAPATH, 'wallet.dat'), JSON.stringify([
+      [name, {private: wallet.private, public: wallet.public}]
+    ]));
+    await write(join(APPDATAPATH, 'addresses.dat'), addresses);
+    resolve(wallet.public);
+  } catch (e) {
+    console.log(e);
+  } finally {
+  }
+})
+
+/**
+ *
+ */
+export const createNewAddress = (name = Math.random().toString(36).slice(-8)) => new Promise(async (resolve, reject) => {
+  // create new address
+  const wallet = new CryptoWallet(olivia ? 'olivia' : 'leofcoin').new();
+  // get local addresses
+  try {
+    const walletAddresses = await read(join(APPDATAPATH, 'wallet.dat'), 'json');
+    const addresses = await read(join(APPDATAPATH, 'addresses.dat'), 'json');
+    const address = [name, wallet.public];
+    addresses.push(address);
+    walletAddresses.push([name, {private: wallet.private, public: wallet.public}])
+    await write(join(APPDATAPATH, 'wallet.dat'), JSON.stringify(walletAddresses));
+    await write(join(APPDATAPATH, 'addresses.dat'), JSON.stringify(addresses));
+    resolve(wallet.public);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      const n = await newWallet(name)
+      resolve(n)
+    }
+    else {reject(error)};
+  }
+});
+
+export const networkAddress = async net => {
+  let address;
+	if (net === 'olivia') address = await createNewAddress('main');
+  else address = await createNewAddress('main');
+  return address;	
 };
 
 export const net = () => {
@@ -122,12 +211,16 @@ export const net = () => {
 	return main;
 };
 
-const defaultConfig = {
-	bootstrap: bootstrap,
-	miner: {
-		address: networkAddress(net()),
-		intensity: 1
-	}
+const defaultConfig = async () => {
+  const address = await networkAddress(net())
+  console.log(address, 'address');
+	return {
+    bootstrap: bootstrap,
+  	miner: {
+  		address,
+  		intensity: 1
+  	}
+  }
 };
 
 const validateAndFixConfig = config => {
@@ -151,11 +244,29 @@ export const getUserConfig = new Promise(resolve => {
 	read(configPath, 'json')
 		.then(config => validateAndFixConfig(config))
     .then(config => resolve(config))
-		.catch(error => {
+		.catch(async error => {
 			if (error.code !== 'ENOENT') {
 				console.error(error);
 			}
-			resolve(defaultConfig);
+			resolve(await defaultConfig());
 			debug('new config file created');
 		});
+});
+
+/**
+ * allow retry upto "amount" times
+ * @param {number} amount
+ */
+export const allowFailureUntillEnough = (func, amount = 5) => new Promise(async (resolve, reject) => {
+  if (typeof func !== 'function') reject('function undefined');
+  if (typeof amount !== 'number') reject(`Expected amount to be a typeof Number`);
+  let count = 0;
+  for (var i = 0; i < amount; i++) {
+    try {
+      await func();
+      resolve();
+    } catch (error) {
+      if (amount === count) reject(error);
+    }
+  }
 });
