@@ -7,11 +7,11 @@ export const config = {
 
 export const swarm = {
 	peers: () => ipfs.swarm.peers(),
-	connect: addresses => new Promise((resolve, reject) => {
+	connect: addresses => new Promise(async (resolve, reject) => {
 		try {
-      addresses.forEach(async addr =>{
-  			await ipfs.swarm.connect(addr);
-  		});
+      for (const addr of addresses) {
+        await ipfs.swarm.connect(addr);
+      }
 
   		resolve();
     } catch (e) {
