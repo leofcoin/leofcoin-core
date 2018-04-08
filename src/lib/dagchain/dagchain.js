@@ -1,11 +1,11 @@
 import { DAGNode } from 'ipld-dag-pb';
 import { decode, encode } from 'bs58';
 import EventEmitter from 'events';
-import { chain, difficulty, getUnspent, longestChain, lastBlock } from './dagchain-interface';
+import { chain, difficulty, getUnspent, longestChain, lastBlock, newGenesisDAGNode } from './dagchain-interface';
 import { DAGBlock, createDAGNode, validate } from './dagblock';
 import { read, write } from 'crypto-io-fs';
 import { join } from 'path';
-import { genesis, genesisCID, localIndex, localCurrent, networks } from './../../params';
+import { genesis, genesisCID, localIndex, localCurrent, localDAGAddress, localDAGMultiaddress, networks } from './../../params';
 import { debug, hashFromMultihash, multihashFromHex, succes, log } from './../../utils';
 import bus from './../bus';
 import IPFS from 'ipfs-api';
@@ -44,8 +44,7 @@ export class DAGChain extends EventEmitter {
       try {
         await this.ipfs.pubsub.subscribe('block-added', this.announceBlock);
         const { hash } = await longestChain();
-        console.log(hash);
-        this.name = hash;
+        this.name = hash || await localDAGMultiaddress;
         this.node = await this.get(this.link);
         log(`Running on the ${process.argv[2]} network`);
         await this.loadChain();
@@ -122,7 +121,9 @@ export class DAGChain extends EventEmitter {
 
   async publish(multihash) {
     const published = await this.ipfs.name.publish(multihash);
-    await this.sync();
+    if (this.name) {
+      await this.sync();
+    }
     await this.pin(published['value']);
     return published['name']  // only needed when creating genesis block
   }
@@ -136,7 +137,7 @@ export class DAGChain extends EventEmitter {
           const block = await new DAGBlock(link.multihash);
           if (index < block.index) {
             await this.pin(encode(link.multihash)); // pin block locally
-            await this.updateLocals(`1220${block.hash}`, block.index);
+            await this.updateLocals(`1220${block.hash}`, block.index, this.link);
             console.log(`added block: ${block.index}  ${block.hash}`);
           }
           chain[block.index] = block;
@@ -183,26 +184,27 @@ export class DAGChain extends EventEmitter {
       chain[block.index] = block;
       bus.emit('block-added', block);
       await this.pin(multihashFromHex(block.hash)); // pin block locally
-      await this.updateLocals(`1220${block.hash}`, block.index);
+      await this.updateLocals(`1220${block.hash}`, block.index, this.link);
     });
   }
   // TODO: write using ipfs.files.write
-  writeLocals(CID, index) {
+  writeLocals(CID, index, DAGAdress) {
     return new Promise(async (resolve, reject) => {
       await write(localIndex, JSON.stringify(index));
       await write(localCurrent, CID);
+      await write(localDAGAddress, DAGAdress);
       resolve();
     });
   }
 
-  updateLocals(CID, height) {
+  updateLocals(CID, height, DAGAdress) {
     return new Promise(async (resolve, reject) => {
       try {
         const index = await read(localIndex, 'json');
         index.push([height, CID]);
-        await this.writeLocals(CID, index);
+        await this.writeLocals(CID, index, DAGAdress);
       } catch (error) {
-        await this.writeLocals(CID, [[height, CID]]);
+        await this.writeLocals(CID, [[height, CID]], DAGAdress);
       }
       resolve();
     });
@@ -217,45 +219,28 @@ export class DAGChain extends EventEmitter {
    */
   async newDAGChain() {
     try {
-      const genesisDAGNode = await this.newGenesisDAGNode(difficulty());
+      const genesisDAGNode = await newGenesisDAGNode(difficulty());
       const block = await this.put(genesisDAGNode);
-      console.log(block);
-      await this.pin(encode(block.multihash));
-      console.log('pinned');
+      // await this.pin(encode(block.multihash));
       const chainDAG = await this.ipfs.object.new('unixfs-dir');
       const height = JSON.parse(genesisDAGNode.data.toString()).index;
-      const updated = await this.addLink(chainDAG.multihash, {name: height, size: block.size, multihash: block.multihash});
+      const newDAGChain = await this.ipfs.object.patch.addLink(chainDAG.multihash, {name: height, size: block.size, multihash: block.multihash});
       const CID = block.multihash.toString('hex'); // The CID as an base58 string
-      await this.updateLocals(CID, height);
-      succes('dag chain created');
-      log(`DAGChain name ${updated}`);
-      log(`Genesis ${CID}`);
+      await this.updateLocals(CID, 0, encode(newDAGChain.multihash))
+      succes('genesisBlock created');
+      log(`genesisBlock: ${block.data.toString()}`);
+      log(`Genesis: ${encode(block.data)}\nCID:\t${CID}`);
+      log(`DAGChain name ${encode(newDAGChain.multihash)}`);
+      return;
     } catch (e) {
       console.error(e);
     }
   }
 
-  /**
-   * Create a new genesis block
-   */
-  async newGenesisDAGNode(difficulty) {
-    let dagnode;
-    const block = {
-  		index: 0,
-  		prevHash: '0',
-  		time: Math.floor(new Date().getTime() / 1000),
-  		transactions: [],
-  		nonce: 0
-  	};
-
-  	dagnode = await createDAGNode(block);
-    block.hash = dagnode.multihash.toString('hex').substring(4);
-    while (parseInt(block.hash.substring(0, 8), 16) >= difficulty) {
-      block.nonce++;
-      dagnode = await createDAGNode(block);
-      block.hash = dagnode.multihash.toString('hex').substring(4);
-    }
-    return dagnode;
+  async updateLocalChain(block) {
+    const dagnode = await new DAGBlock().put(block);
+    await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
+    return;
   }
 
   // TODO: go with previous block instead off lastBlock
@@ -264,11 +249,8 @@ export class DAGChain extends EventEmitter {
       const block = JSON.parse(data.toString());
       try {
         // const previousBlock = await lastBlock(); // test
-        const previousBlock = chain[chain.length - 1];
-        const invalid = await validate(previousBlock, block, difficulty(), getUnspent());
-        const dagnode = await new DAGBlock().put(block);
-        // await this.sync();
-        const updated = await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
+        await validate(chain[chain.length - 1], block, difficulty(), getUnspent());
+        await this.updateLocalChain(block);
         this.addBlock(block); // add to chain
       } catch (error) {
         // TODO: remove publish invalid-block

@@ -1,12 +1,16 @@
 import { config, median, multihashFromHex } from './../../utils';
 import { validateTransaction } from './../transaction.js';
 import { TransactionError } from './../errors.js';
-import { DAGBlock } from './dagblock';
-import { encode } from 'bs58';
+import { DAGBlock, createDAGNode, validate } from './dagblock';
+import { encode, decode } from 'bs58';
+import { GENESISBLOCK } from '../../params';
+import { resolvePeers } from '../network/peernet';
 import IPFS from 'ipfs-api';
 const ipfs = new IPFS()
 
-global.chain = [];
+global.chain = [
+  GENESISBLOCK
+];
 
 export const chain = (() => global.chain)();
 
@@ -96,16 +100,14 @@ export const transformBlock = ({multihash, data}) => {
 // TODO: global peerlist
 export const longestChain = () => new Promise(async (resolve, reject) => {
   try {
-    const { id } = await ipfs.id();
-    console.log(id);
-    let peers = await ipfs.swarm.peers(); // retrieve peerlist
+    let peers = await resolvePeers(); // retrieve peerlist
     peers = peers.map(({ peer, addr }) => {return {id: peer.toB58String(), addr: addr.toString()}});
     // peers.push(id);
     const stats = [];
     for (const {addr, id} of peers) {
       try {
-        const con = await ipfs.swarm.connect(`${addr}/ipfs/${id}`);
-        const ref = await ipfs.name.resolve(id, {recursive: true});
+        await ipfs.swarm.connect(`${addr}/ipfs/${id}`);
+        const ref = await ipfs.name.resolve(id);
         const hash = ref.replace('/ipfs/', '');
         // get chain stats for every peer
         const stat = await ipfs.object.stat(hash);
@@ -128,7 +130,7 @@ export const longestChain = () => new Promise(async (resolve, reject) => {
     }, {height: 0, hash: null});
     resolve(stat);
   } catch (e) {
-    reject(e)
+    reject(e);
   }
 });
 
@@ -146,3 +148,26 @@ export const nextBlock = async address => {
   const previousBlock = chain[chain.length - 1];
   return await new DAGBlock({transactions, previousBlock, address});
 };
+
+/**
+ * Create a new genesis block
+ */
+export const newGenesisDAGNode = async difficulty => {
+  let dagnode;
+  const block = {
+    index: 0,
+    prevHash: '0',
+    time: Math.floor(new Date().getTime() / 1000),
+    transactions: [],
+    nonce: 0
+  };
+
+  dagnode = await createDAGNode(block);
+  block.hash = dagnode.multihash.toString('hex').substring(4);
+  while (parseInt(block.hash.substring(0, 8), 16) >= difficulty) {
+    block.nonce++;
+    dagnode = await createDAGNode(block);
+    block.hash = dagnode.multihash.toString('hex').substring(4);
+  }
+  return dagnode;
+}
