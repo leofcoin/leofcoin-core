@@ -22,7 +22,7 @@ export default class Miner extends StoreHandler {
     if (!address) {
       MinerWarning('All profit will be donated until address is set');
     }
-    this.address = 'oaJWsPm7kGrvmvxhW4qQZtMi2DyK7DTcru';
+    this.address = address;
     this.running = 0;
 
 

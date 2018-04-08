@@ -47,9 +47,7 @@ const handleMinerRequest = async ({name, params}) => {
         const { address, intensity } = params;
         const addMiner = count => {
           for (var i = 0; i < count; i++) {
-            const miner = new Miner();
-            miner.address = address;
-            miners.push(new Miner());
+            miners.push(new Miner(address));
           }
         }
         if (!intensity) {
