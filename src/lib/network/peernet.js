@@ -49,7 +49,7 @@ export const resolvePeers = () => new Promise(resolve => {
   }
   ipfs.swarm.peers().then(peers => resolves(peers));
   runs++;
-  if (!done) setTimeout(() => resolvePeers().then(peers => resolves(peers)), 3000);
+  if (!done) setTimeout(() => resolvePeers().then(peers => resolves(peers)), 1000);
 })
 
 export const _connect = async addresses =>
@@ -63,23 +63,19 @@ export const _connect = async addresses =>
       return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
     }
   });
-export const connect = (addresses) => new Promise(async (resolve, reject) => {
+export const connect = (addresses = []) => new Promise(async (resolve, reject) => {
   try {
     bus.emit('connecting', true);
     debug('connecting peers');
     const { id } = await ipfs.id();
     // TODO: filter using peerrep
-    addresses = addresses.map(address => {
-      if(!address.includes(id)) return address
-    });
-    await handleDefaultBootstrapAddresses(addresses); // TODO: invoke only on install
     const peers = await resolvePeers();
     // transform peers into valid ipfs addresses
-    peers.forEach(({addr, peer}) => addresses.push(`${addr.toString()}/ipfs/${peer.toB58String()}`));
+    addresses = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
     if (addresses) {
       await _connect(addresses)
     }
-    succes(`connected to ${addresses.length - 1} peers`);
+    succes(`connected to ${addresses.length} peers`);
 
     ipfs.pubsub.subscribe('peer-connected', event => {
       // TODO: update reputations
