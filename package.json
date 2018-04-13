@@ -4,7 +4,7 @@
   "description": "leofcoin core library",
   "repository": "https://github.com/leofcoin-io/leofcoin-core",
   "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
-  "main": "core.js",
+  "main": "dist/core.js",
   "license": "MIT",
   "private": false,
   "bin": {
@@ -15,7 +15,8 @@
     "package": "npm run build && sh build/browser.sh",
     "start-ui": "live-server --port=2050",
     "start": "node dist/core.js olivia",
-    "dev": "node dev/run.js"
+    "dev": "node dev/run.js",
+    "test": "node test.js"
   },
   "backed": {
     "bundles": [
