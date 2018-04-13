@@ -1,3 +1,3 @@
-browserify lib/browser/wallet.temp.js --standalone CryptoWallet > lib/browser/wallet.js
+browserify dist/lib/browser/wallet.temp.js --standalone CryptoWallet > dist/lib/browser/wallet.js
 
-rm -rf lib/browser/*.temp.**
+rm -rf dist/lib/browser/*.temp.**

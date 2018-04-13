@@ -1,21 +1,20 @@
-dist: trusty
 language: node_js
 node_js:
-- '7'
-- '8'
-- '9'
-cache:
+  - '7'
+  - '8'
+  - '9'
+cache: 
   yarn: true
 before_script:
-- yarn global add backed-cli
-- yarn
-- npm run package
-deploy:
+  - yarn global add backed-cli
+  - yarn
+  - npm run package 
+deploy: 
   skip_cleanup: true
   provider: npm
   email: vandeurenglenn@gmail.com
   api_key:
-    secure: yD2jLi68fSfN1E9pDFRxUKE7r/wn1E2V+nZiqbrYMKrG6ZwNj1tTo0+LnzKGi8XUM3VfRp0mzahzJGIhIY1T2eEfdbVZ75X+R6vx0bApha5qm9SSHMH+UEzdOyguLrxIbgVlNfDSD1nPhTEJFHAV7aEVSp6LIqheM8B7f13JGhFkj/OdLOGSsWsctb7L3/QBKUkwVgHTTu4p5DfWE9xicT9poOaKapsdVATaMaoHPhISw48sSMUccKN7YQlTAcK4Vtgs7/5flHoT6RGgJ2JbfYAeCMO43msrUD8Zo/DunQxWrJ9XSYYazRnO58ugKBfrvszKImwSlC5eqxwTrOmDwOEk4ySeh8mx5RyzLSfzSyjoN8wllXrV8k0G9CNNgAgMoiYlh47J8TJF3Z1JCXjQYhKWRtiEvEbIdDyX2qWMLSCno4pMYPnnXop3LDJ3IHupurkZtjnfipa1FA2W/HDxcuSCgFxglYeCEGMhtj/Z18HfEGU8djdlTLzc7uPgQ3LT+tqUGgzDCZvAqv8495yPXIua8ocLzzdyg9MN8aDa9OJ3pAgNxGTOv7ck0F+MR1phv/fC+k8TMdX8hvNQWROCpKqLlg/NP3WKj53lxgeagd7s7ID0g1Kw65y1Kt1LLWJIukBV7e5Js2XbKbVL00TjWpMA359ica4oElBHZoJ/DoE=
+    secure: J7keI+EiOcHs9CfHQz/E246oD787r6QuuSda6YMqQeMBNLwbkWp/jcUUbO0FmTsgCJbopdYpXS6kKYBM2LYNhhqwtOzdpgTlkw6JswDvb/tyHs5pVzJ7vUPDiaRsapFytzUT/8euRpN7gxAB023I4As06YmAWxy+tExZZXGcB2i6UoH217O2O5S9MrNiZyhagX908tDz4CAtpKRtKWmG9sj6K5w5xwnof2MBuKQHELx54/45GBrS3kWfpqd+ugJrcER2kTBiad7ku3/V1GwEUd4TqdUB6GImGYFBMKxSCQf+zdfS6v8DH+UyYjtLA3pHcDYqeWbUKp17+f9wgYxnMcoE2VWGm1H5zkrloZStT86aawkfN8EJ8MrvcKLLa0zeK14UwPxctvL/Pguk5DrLhRgRSmqX2/RFkw0YzaJX3iWl1TbVd9E59n1ctOYqTjtmhtVe9qtS4H+qrqKaYBUYUmnS2XiNVurwmg0YJJuznnq5SXPSBE7AGi7YOU+4RDRCrmSrtKMWz1nRrIezR/Pax4y0R+3t6vah4mclSuUiUJloR14dCllyTQE35vIYjMvoAhcQeDJVugvwNG0Zmas1qZwvSvDhYMA6xA9s3FzpU3LRgvmPPxJT4l8Dh/Lp4tsTUG2W50gm4P4WtfcN2bl/IeOkOt/t/e+Yj+fqcxDr1cI=
   on:
     tags: true
-    repo: crypto-io/crypto-core
+    repo: leofcoin/leofcoin-core
