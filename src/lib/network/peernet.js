@@ -69,13 +69,14 @@ export const connect = (addresses = []) => new Promise(async (resolve, reject) =
     debug('connecting peers');
     const { id } = await ipfs.id();
     // TODO: filter using peerrep
-    const peers = await resolvePeers();
+    let peers = await resolvePeers();
     // transform peers into valid ipfs addresses
-    addresses = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
-    if (addresses) {
-      await _connect(addresses)
-    }
-    succes(`connected to ${addresses.length} peers`);
+    peers = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
+    if (peers && peers.length === 0) peers = addresses;
+
+    await _connect(peers);
+    
+    succes(`connected to ${peers.length} peer(s)`);
 
     ipfs.pubsub.subscribe('peer-connected', event => {
       // TODO: update reputations

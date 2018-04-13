@@ -2,37 +2,29 @@ import { join } from 'path';
 import { homedir } from 'os';
 import { decode } from 'bs58';
 import { read } from 'crypto-io-fs';
-// paths
-export let olivia;
-export let genesis;
 
-const args = process.argv.forEach(arg => {
-	if (arg === 'olivia' || arg === 'testnet') olivia = true;
-	if (arg === 'genesis') genesis = true;
-});
-
-// TODO: finish multiple network support (setup multiple repos etc) see issue #6
 export const networks = {
 	'leofcoin': join(homedir(), '.leofcoin'),
 	'olivia': join(homedir(), '.leofcoin/olivia')
 };
+
+export const olivia = process.argv.includes('olivia') || process.argv.includes('testnet');
+export const genesis = process.argv.includes('genesis');
+export const network = olivia ? 'olivia' : 'leofcoin';
 export const AppData = join(homedir(), 'AppData', 'Roaming', 'Leofcoin');
 
 
-export const networkPath = networks[olivia ? 'olivia': 'leofcoin'];
+export const networkPath = networks[network];
 export const netKeyPath = join(networkPath, 'swarm.key');
-
 export const localCurrent = join(networkPath, 'db', 'current');
 export const localIndex = join(networkPath, 'db', 'index');
 export const localDAGAddress = join(networkPath, 'db', 'dag.multiaddress');
-
 // export const
 // TODO: remove seed once we have a static ip for our ipfs daemon node
 // untill seed is removed we retrieve the keys using socket.io
 // TODO: make AppData overwriteable
 export const seed = 'https://septimal-balinese-2547.dataplicity.io';
 export const seeds = 'QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n';
-export const bootstrap = [];
 export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
@@ -45,20 +37,25 @@ export const GENESISBLOCK = (() => {
 	block.hash = genesisCID.substring(4);
 	return block;
 })();
-export const localDAGMultiaddress = (async () => await read(localDAGAddress, 'string'))()
+export const localDAGMultiaddress = async () => {
+  try {
+    const address = await read(localDAGAddress, 'string')
+    return address;
+  } catch (e) {
+    console.warn(`initial run::${e}`)
+  }
+};
 
 export const checkpoints = [
 ];
 
 export default {
 	seed,
-	bootstrap,
 	AppData,
 	configPath,
 	localCurrent,
 	localIndex,
 	reward,
-	genesis,
 	consensusSubsidyInterval,
 	consensusSubsidyPercentage
 };

@@ -1,5 +1,6 @@
 import IPFS from 'ipfs-api';
-const ipfs = new IPFS()
+const ipfs = new IPFS();
+
 export const config = {
 	get: property => ipfs.config.get(property),
 	set: (property, value) => ipfs.config.set(property, value),

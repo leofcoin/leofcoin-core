@@ -1,6 +1,6 @@
 'use strict';
 import { read, write } from 'crypto-io-fs';
-import { bootstrap, configPath, olivia } from './params';
+import { configPath, olivia, network } from './params';
 import { encode } from 'bs58';
 import CryptoWallet from './lib/wallet';
 import chalk from 'chalk';
@@ -58,6 +58,12 @@ export const succes = text => {
 
 export const fail = text => {
   console.log(chalk.red(text));
+}
+
+export const groupCollapsed = (text, cb) => {
+  console.groupCollapsed(chalk.gray.bold(text));
+  cb();
+  console.groupEnd();
 }
 /**
  * Get hash difficulty
@@ -155,7 +161,7 @@ export const config = {
 
 export const newWallet = ( name= 'main') => new Promise(async (resolve, reject) => {
   try {
-    const wallet = new CryptoWallet(olivia ? 'olivia' : 'leofcoin');
+    const wallet = new CryptoWallet(network);
     wallet.new();
     const addresses = JSON.stringify([[name, wallet.public]]);
     await write(join(APPDATAPATH, 'wallet.dat'), JSON.stringify([
@@ -174,7 +180,8 @@ export const newWallet = ( name= 'main') => new Promise(async (resolve, reject) 
  */
 export const createNewAddress = (name = Math.random().toString(36).slice(-8)) => new Promise(async (resolve, reject) => {
   // create new address
-  const wallet = new CryptoWallet(olivia ? 'olivia' : 'leofcoin').new();
+  const wallet = new CryptoWallet(network);
+  wallet.new()
   // get local addresses
   try {
     const walletAddresses = await read(join(APPDATAPATH, 'wallet.dat'), 'json');
@@ -196,6 +203,7 @@ export const createNewAddress = (name = Math.random().toString(36).slice(-8)) =>
 
 export const networkAddress = async net => {
   let address;
+  console.log(net);
 	if (net === 'olivia') address = await createNewAddress('main');
   else address = await createNewAddress('main');
   return address;	
@@ -212,23 +220,15 @@ export const net = () => {
 };
 
 const defaultConfig = async () => {
-  const address = await networkAddress(net())
+  const address = await networkAddress(network)
   console.log(address, 'address');
 	return {
-    bootstrap: bootstrap,
   	miner: {
   		address,
   		intensity: 1
   	}
   }
 };
-
-const validateAndFixConfig = config => {
-  config.bootstrap.forEach(address => {
-    if (address.length > 0) return address
-  });
-  return config;
-}
 
 export const hexFromMultihash = multihash => {
   return multihash.toString('hex').substring(4);
@@ -242,7 +242,6 @@ export const multihashFromHex = hex => {
 // search for the config file & create new one when needed
 export const getUserConfig = new Promise(resolve => {
 	read(configPath, 'json')
-		.then(config => validateAndFixConfig(config))
     .then(config => resolve(config))
 		.catch(async error => {
 			if (error.code !== 'ENOENT') {
