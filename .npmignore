@@ -1,0 +1,7 @@
+node_modules
+src
+.*
+rollup.config
+*.log
+build
+test.js
