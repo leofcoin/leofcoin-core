@@ -1,6 +1,6 @@
 {
   "name": "leofcoin-core",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "description": "leofcoin core library",
   "repository": "https://github.com/leofcoin-io/leofcoin-core",
   "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
@@ -12,7 +12,6 @@
   },
   "scripts": {
     "build": "rollup -c",
-    "package": "npm run build",
     "start": "node dist/commonjs/core.js olivia",
     "test": "node test.js",
     "watch": "rollup -c -w",

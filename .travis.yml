@@ -6,9 +6,7 @@ node_js:
 cache: 
   yarn: true
 before_script:
-  - yarn global add backed-cli
-  - yarn
-  - npm run package 
+  - npm run build 
 deploy: 
   skip_cleanup: true
   provider: npm
