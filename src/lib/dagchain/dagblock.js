@@ -6,12 +6,12 @@ import { BlockError } from '../errors';
 import IPFS from 'ipfs-api';
 const ipfs = new IPFS();
 
-export const calculateHash = async block => {
+const calculateHash = async block => {
   block = await createDAGNode(block);
   return block.multihash.toString('hex').substring(4);
 }
 
-export const createDAGNode = ({index, prevHash, time, transactions, nonce}) => {
+const createDAGNode = ({index, prevHash, time, transactions, nonce}) => {
   return new Promise((resolve, reject) => {
     DAGNode.create(JSON.stringify({
       index,
@@ -36,7 +36,7 @@ export const createDAGNode = ({index, prevHash, time, transactions, nonce}) => {
  * @param address {string}
  * @return {index, prevHash, time, transactions, nonce}
  */
-export class DAGBlock {
+class DAGBlock {
 	constructor(options) {
     if (!options) return;
 		if (typeof options === 'object' && !Buffer.isBuffer(options)) return this.newBlock(options);
@@ -79,11 +79,18 @@ export class DAGBlock {
  * @param {number} difficulty
  * @param {number} unspent
  */
-export const validate = async (previousBlock, block, difficulty, unspent) => {
+const validate = async (previousBlock, block, difficulty, unspent) => {
 	if (!isValid('block', block)) throw BlockError('data');
 	if (previousBlock.index + 1 !== block.index) throw BlockError('index');
 	if (previousBlock.hash !== block.prevHash) throw BlockError('prevhash');
 	if (await calculateHash(block) !== block.hash) throw BlockError('hash');
 	if (getDifficulty(block.hash) > difficulty) throw BlockError('difficulty');
 	return validateTransactions(block.transactions, unspent);
+};
+
+export {
+  DAGBlock,
+  validate,
+  calculateHash,
+  createDAGNode
 };

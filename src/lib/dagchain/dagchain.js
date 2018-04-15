@@ -149,26 +149,13 @@ export class DAGChain extends EventEmitter {
       if (this.index) {
         const { index, prevHash } = await this.localBlock();
         const height = this.index.length - 1;
+        let syncCount = height - index;
         const multihash = this.index[height].multihash;
-        console.log(multihash);
-        let syncCount = index - height;
         log(`syncing ${syncCount} blocks`)
         await this.resolveBlocks(multihash, index);
         await this.updateLocals(multihash.toString('hex'), height, this.link);
         await this.publish(this.link);
-        // await this.index.forEach(async link => {
-        //   const block = await new DAGBlock(link.multihash);
-        //   if (index < block.index) {
-        //     await this.pin(encode(link.multihash)); // pin block locally
-        //     await this.updateLocals(`1220${block.hash}`, block.index, this.link);
-        //     console.log(`added block: ${block.index}  ${block.hash}`);
-        //   }
-        //   chain[block.index] = block;
-        //   console.log(`loaded block: ${block.index}  ${block.hash}`);
-        // });
-      } // else {
-        // const { index, prevHash } = await this.localBlock();
-      // }
+      }
       bus.emit('syncing', false);
     } catch (e) {
       console.error('syncChain', e);

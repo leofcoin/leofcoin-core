@@ -6,9 +6,9 @@ import { encode, decode } from 'bs58';
 import { GENESISBLOCK } from '../../params';
 import { resolvePeers } from '../network/peernet';
 import IPFS from 'ipfs-api';
-const ipfs = new IPFS()
+const ipfs = new IPFS();
 
-global.chain = [
+global.chain = global.chain || [
   GENESISBLOCK
 ];
 

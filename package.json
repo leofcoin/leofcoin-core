@@ -4,81 +4,19 @@
   "description": "leofcoin core library",
   "repository": "https://github.com/leofcoin-io/leofcoin-core",
   "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
-  "main": "dist/core.js",
+  "main": "index.js",
   "license": "MIT",
   "private": false,
   "bin": {
     "core": "bin/cli.js"
   },
   "scripts": {
-    "build": "sh build/node.sh",
-    "package": "npm run build && sh build/browser.sh",
-    "start-ui": "live-server --port=2050",
-    "start": "node dist/core.js olivia",
-    "dev": "node dev/run.js",
-    "test": "node test.js"
-  },
-  "backed": {
-    "bundles": [
-      {
-        "src": "src/lib/wallet.js",
-        "dest": "dist/lib/wallet.js",
-        "format": "cjs",
-        "plugins": {
-          "json": {},
-          "node-resolve": {
-            "jsnext": true,
-            "main": true,
-            "preferBuiltins": false
-          },
-          "commonjs": {
-            "include": "node_modules/**"
-          }
-        }
-      },
-      {
-        "src": "src/lib/wallet.js",
-        "dest": "dist/lib/browser/wallet.temp.js",
-        "format": "cjs",
-        "plugins": {
-          "json": {},
-          "node-builtins": {},
-          "node-resolve": {
-            "jsnext": true,
-            "browser": true,
-            "main": true
-          },
-          "commonjs": {
-            "include": "node_modules/**"
-          }
-        }
-      },
-      {
-        "src": "src/index.mjs",
-        "dest": "dist/core.js",
-        "format": "cjs"
-      },
-      {
-        "src": "src/lib/workers/miner-worker.js",
-        "dest": "dist/lib/workers/miner-worker.js",
-        "format": "cjs"
-      },
-      {
-        "src": "src/utils.js",
-        "dest": "dist/lib/utils.js",
-        "format": "cjs"
-      },
-      {
-        "src": "src/lib/hash.js",
-        "dest": "dist/lib/hash.js",
-        "format": "cjs"
-      },
-      {
-        "src": "src/lib/dagchain/dagchain.js",
-        "dest": "dist/lib/dagchain/dagchain.js",
-        "format": "cjs"
-      }
-    ]
+    "build": "rollup -c",
+    "package": "npm run build",
+    "start": "node dist/commonjs/core.js olivia",
+    "test": "node test.js",
+    "watch": "rollup -c -w",
+    "dev": "npm-run-all --parallel start watch"
   },
   "dependencies": {
     "bitcoinjs-lib": "^3.3.2",
@@ -105,16 +43,12 @@
     "websocket": "^1.0.25"
   },
   "devDependencies": {
-    "@std/esm": "^0.25.3",
     "eslint": "^4.17.0",
+    "npm-run-all": "^4.1.2",
+    "rollup": "^0.57.1",
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.0.2",
     "tape": "^4.8.0"
-  },
-  "@std/esm": {
-    "mode": "js",
-    "cjs": true,
-    "await": true
   }
 }

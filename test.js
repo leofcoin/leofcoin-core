@@ -4,7 +4,7 @@ const { join } = require('path');
 const FIRSTBLOCK_HASH = '000008a42c7fdbaa5c55af0dfda426bfb17fa151874823204a3131b4865b691e';
 test('core', tape => {
 	tape.plan(1);
-	const core = spawn('node', [join(process.cwd(), 'dist/core.js'), 'olivia']);
+	const core = spawn('node', [join(process.cwd(), 'dist/commonjs/core.js'), 'olivia']);
 	core.stdout.on('data', data => {
 		const message = data.toString();
 		console.log(message);

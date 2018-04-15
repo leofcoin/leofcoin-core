@@ -17,7 +17,7 @@ export default class Miner extends StoreHandler {
   constructor(address, intensity, autostart) {
     // TODO: limit intensity when pool is empty
     super();
-    if (process.versions.electron) this.workerPath = join(__dirname, 'node_modules/leofcoin-core/dist/lib/workers/miner-worker.js')
+    if (process.versions.electron) this.workerPath = join(__dirname, 'node_modules/leofcoin-core/dist/miner-worker.js')
     else this.workerPath = join(__dirname, 'lib/workers/miner-worker.js')
     if (!address) {
       MinerWarning('All profit will be donated until address is set');
