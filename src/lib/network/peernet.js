@@ -67,12 +67,13 @@ export const connect = (addresses = []) => new Promise(async (resolve, reject) =
   try {
     bus.emit('connecting', true);
     debug('connecting peers');
+    await handleDefaultBootstrapAddresses(addresses);
     const { id } = await ipfs.id();
     // TODO: filter using peerrep
     let peers = await resolvePeers();
     // transform peers into valid ipfs addresses
     peers = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
-    if (peers && peers.length === 0) peers = addresses;
+    // if (peers && peers.length === 0) peers = addresses;
 
     await _connect(peers);
     
