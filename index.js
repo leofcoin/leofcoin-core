@@ -8,6 +8,6 @@ const browserLoader = () => {
 	document.head.appendChild(script);
 };
 
-if(typeof process === 'object') require('./dist/commonjs');
+if(typeof process === 'object') require('./dist/commonjs/core');
 else if (typeof window !== 'undefined') browserLoader();
 else throw new Error('Unsupported Environment');
