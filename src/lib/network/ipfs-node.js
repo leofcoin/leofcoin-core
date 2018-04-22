@@ -57,13 +57,13 @@ export const IPFSNode = () => new Promise(async (resolve, reject) => {
 
     return f.spawn({init: false, repoPath: networkPath, disposable: false}, (error, ipfsd) => {
       if (error) { reject(error) }
-      return ipfsd.start(['--enable-pubsub-experiment'], error => {global.ipfs = ipfsd.api;
+      return ipfsd.start(['--enable-pubsub-experiment'], error => {
+        global.ipfs = ipfsd.api;
         if (error) { reject(error) }
-        resolve({ipfsd, repo: ipfsRepo})
-          // ipfsd.stop()
-      })
+        resolve({ ipfsd });
+      });
 
-    })
+    });
   } catch (error) {
     reject(error);
   }

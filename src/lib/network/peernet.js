@@ -37,14 +37,16 @@ const handleDefaultBootstrapAddresses = async addresses => {
 }
 
 let done = false;
-let runs = 0
+let runs = 0;
 export const resolvePeers = () => new Promise(resolve => {
   if (runs === 5) {
     debug('searched for peers but none found, returning empty array');
+    runs = 0;
     return resolve([]);
   }
   const resolves = peers => {
     done = true;
+    runs = 0;
     resolve(peers);
   }
   ipfs.swarm.peers().then(peers => resolves(peers));
@@ -63,16 +65,37 @@ export const _connect = async addresses =>
       return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
     }
   });
+export const connectBootstrap = async addresses => {
+  bus.emit('connecting', true);
+  debug('connecting bootsrap peers');
+  // await handleDefaultBootstrapAddresses(addresses);
+  // const { id } = await ipfs.id();
+  // TODO: filter using peerrep
+  // let peers = await resolvePeers();
+  // transform peers into valid ipfs addresses
+  // peers = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
+  // if (peers && peers.length === 0) peers = addresses;
+
+  await _connect(['/ip6/2a02:1810:bc39:2300:80fb:dc02:a465:290/tcp/4002/ipfs/Qme1U1nn6dHdmTE2ehk533WAtaJfJJgdWwtcofaSNbQNnu']);
+
+  succes(`connected to ${1} bootstrap peer(s)`);
+
+  // ipfs.pubsub.subscribe('peer-connected', event => {
+  //   // TODO: update reputations
+  //   if (event.from !== id) console.log(event); // announcepeer
+  // });
+  // ipfs.pubsub.publish('peer-connected', new Buffer(id));
+  // resolve();
+}
 export const connect = (addresses = []) => new Promise(async (resolve, reject) => {
   try {
     bus.emit('connecting', true);
     debug('connecting peers');
-    await handleDefaultBootstrapAddresses(addresses);
+    // await handleDefaultBootstrapAddresses(addresses);
     const { id } = await ipfs.id();
     // TODO: filter using peerrep
-    let peers = await resolvePeers();
     // transform peers into valid ipfs addresses
-    peers = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
+    const peers = Array.from(global.peerset.entries()).map(peer => peer[1]);
     // if (peers && peers.length === 0) peers = addresses;
 
     await _connect(peers);

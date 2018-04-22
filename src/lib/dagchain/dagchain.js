@@ -28,7 +28,7 @@ export class DAGChain extends EventEmitter {
     });
     return links.length > 0 ? links : [];
   }
-  constructor({ipfs, repo}) {
+  constructor({ipfs}) {
     super();
     this.announceBlock = this.announceBlock.bind(this);
 

@@ -1,13 +1,14 @@
-import { initConnection } from './lib/network/secure-client-connection';
+// import { initConnection } from './lib/network/secure-client-connection';
 import { getUserConfig, debug, allowFailureUntillEnough, log, groupCollapsed } from './utils';
 import bus from './lib/bus';
 import { join } from 'path';
 import './server/index';
-import { connect } from './lib/network/peernet';
+import { connect, connectBootstrap } from './lib/network/peernet';
 import { DAGChain } from './lib/dagchain/dagchain';
 import { configPath } from './params';
 import { IPFSNode, cleanRepo, closeRepo } from './lib/network/ipfs-node';
 import { write } from 'crypto-io-fs';
+import ipfsStar from './lib/network/ipfs-star'
 
 global.states = {
   ready: false,
@@ -20,21 +21,25 @@ export const core = async ({ genesis, network }) => {
 	try {
     const now = Date.now();
     const config = await getUserConfig;
-    const connection = await initConnection;
+    // const connection = await initConnection;
     const secure_now = Date.now();
     bus.emit('stage-one');
-    const {ipfsd, repo} = await IPFSNode();
+    const { ipfsd } = await IPFSNode();
+    const { addresses } = await ipfsd.api.id();
+    await connectBootstrap();
+    const star = ipfsStar(addresses[0], ipfsd.api.pubsub)
 
     const ipfsd_now = Date.now();
     process.on('SIGINT', async () => {
       console.log("Caught interrupt signal");
+      await star.stop();
       await ipfsd.stop();
       setTimeout(async () => {
         process.exit();
-      }, 10);
+      }, 50);
       //graceful shutdown
     });
-    await connect([connection.address]);
+    await connect();
     const connection_now = Date.now();
     bus.emit('stage-two');
     groupCollapsed('Initialize', () => {
@@ -44,8 +49,8 @@ export const core = async ({ genesis, network }) => {
       log(`total load prep took ${(Date.now() - now) / 1000} seconds`);
     })
     await write(configPath, JSON.stringify(config, null, '\t'));
-
-    const chain = new DAGChain({ genesis, network, repo, ipfs: ipfsd.api });
+    const chain = new DAGChain({ genesis, network, ipfs: ipfsd.api });
+    
     await chain.init();
 	} catch (e) {
     if (e.code === 'ECONNREFUSED' || e.message && e.message.includes('cannot acquire lock')) {

@@ -100,13 +100,12 @@ export const transformBlock = ({multihash, data}) => {
 // TODO: global peerlist
 export const longestChain = () => new Promise(async (resolve, reject) => {
   try {
-    let peers = await resolvePeers(); // retrieve peerlist
-    peers = peers.map(({ peer, addr }) => {return {id: peer.toB58String(), addr: addr.toString()}});
+    const addrs = Array.from(global.peerset.entries()).map(peer => peer[1])
     // peers.push(id);
     const stats = [];
-    for (const {addr, id} of peers) {
+    for (const addr of addrs) {
       try {
-        await ipfs.swarm.connect(`${addr}/ipfs/${id}`);
+        await ipfs.swarm.connect(addr);
         const ref = await ipfs.name.resolve(id);
         const hash = ref.replace('/ipfs/', '');
         // get chain stats for every peer
@@ -117,7 +116,7 @@ export const longestChain = () => new Promise(async (resolve, reject) => {
         if (e.code === 'ECONNREFUSED') {
           reject(e);
         }
-        console.log(`Ignoring ${id}`)
+        console.log(`Ignoring ${addr}`)
       }
     }
     // reduce to longest chain
