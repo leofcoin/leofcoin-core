@@ -68,24 +68,8 @@ export const _connect = async addresses =>
 export const connectBootstrap = async addresses => {
   bus.emit('connecting', true);
   debug('connecting bootsrap peers');
-  // await handleDefaultBootstrapAddresses(addresses);
-  // const { id } = await ipfs.id();
-  // TODO: filter using peerrep
-  // let peers = await resolvePeers();
-  // transform peers into valid ipfs addresses
-  // peers = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
-  // if (peers && peers.length === 0) peers = addresses;
-
-  await _connect(['/ip6/2a02:1810:bc39:2300:80fb:dc02:a465:290/tcp/4002/ipfs/Qme1U1nn6dHdmTE2ehk533WAtaJfJJgdWwtcofaSNbQNnu']);
 
   succes(`connected to ${1} bootstrap peer(s)`);
-
-  // ipfs.pubsub.subscribe('peer-connected', event => {
-  //   // TODO: update reputations
-  //   if (event.from !== id) console.log(event); // announcepeer
-  // });
-  // ipfs.pubsub.publish('peer-connected', new Buffer(id));
-  // resolve();
 }
 export const connect = (addresses = []) => new Promise(async (resolve, reject) => {
   try {
