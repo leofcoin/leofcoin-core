@@ -1,7 +1,7 @@
 import { debug, fail, succes } from './../../utils';
 import bus from './../bus';
 import { join } from 'path';
-import { seeds } from '../../params';
+import { seeds, signalServers } from '../../params';
 import { DAGNode } from 'ipld-dag-pb';
 import { encode } from 'bs58';
 const { promisify } = require('util');
@@ -68,6 +68,8 @@ export const _connect = async addresses =>
 export const connectBootstrap = async addresses => {
   bus.emit('connecting', true);
   debug('connecting bootsrap peers');
+
+  await _connect(signalServers);
 
   succes(`connected to ${1} bootstrap peer(s)`);
 }

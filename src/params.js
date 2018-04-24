@@ -8,6 +8,10 @@ export const networks = {
 	'olivia': join(homedir(), '.leofcoin/olivia')
 };
 
+export const signalServers = [
+  '/ip4/192.168.0.10/tcp/4002/ipfs/QmXN5cqP2rd38f2zsDjAM2Y4geXF3jegEma392fdSohfx3'
+]
+
 export const olivia = process.argv.includes('olivia') || process.argv.includes('testnet');
 export const genesis = process.argv.includes('genesis');
 export const network = olivia ? 'olivia' : 'leofcoin';

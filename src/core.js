@@ -27,7 +27,7 @@ export const core = async ({ genesis, network }) => {
     const { ipfsd } = await IPFSNode();
     const { addresses } = await ipfsd.api.id();
     await connectBootstrap();
-    const star = ipfsStar(addresses[0], ipfsd.api.pubsub)
+    const star = ipfsStar(addresses[0], network, ipfsd.api.pubsub)
 
     const ipfsd_now = Date.now();
     process.on('SIGINT', async () => {
@@ -50,8 +50,7 @@ export const core = async ({ genesis, network }) => {
     })
     await write(configPath, JSON.stringify(config, null, '\t'));
     const chain = new DAGChain({ genesis, network, ipfs: ipfsd.api });
-    
-    await chain.init();
+    await chain.init();    
 	} catch (e) {
     if (e.code === 'ECONNREFUSED' || e.message && e.message.includes('cannot acquire lock')) {
       await cleanRepo();
