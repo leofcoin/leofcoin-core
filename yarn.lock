@@ -4981,8 +4981,8 @@ repeat-string@^1.5.2:
   resolved "https://registry.yarnpkg.com/repeat-string/-/repeat-string-1.6.1.tgz#8dcae470e1c88abc2d600fff4a776286da75e637"
 
 repo-configs@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/repo-configs/-/repo-configs-0.3.0.tgz#933cf26c1cb32076926aa1547f7849591789ed2c"
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/repo-configs/-/repo-configs-0.3.1.tgz#c83bbb43030832909abca242609c888e23a4d67b"
   dependencies:
     peer-id "^0.10.6"
 
@@ -5359,8 +5359,8 @@ simple-concat@^1.0.0:
   resolved "https://registry.yarnpkg.com/simple-concat/-/simple-concat-1.0.0.tgz#7344cbb8b6e26fb27d66b2fc86f9f6d5997521c6"
 
 simple-get@^2.7.0:
-  version "2.7.1"
-  resolved "https://registry.yarnpkg.com/simple-get/-/simple-get-2.7.1.tgz#3e2b775334e78f2114e7ef31d20ba8a470c4e662"
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/simple-get/-/simple-get-2.8.1.tgz#0e22e91d4575d87620620bc91308d57a77f44b5d"
   dependencies:
     decompress-response "^3.3.0"
     once "^1.3.1"

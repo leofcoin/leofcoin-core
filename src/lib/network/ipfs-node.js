@@ -7,7 +7,7 @@ import { join } from 'path';
 const ipfsRepo = new REPO(networkPath);
 
 const initRepo = () => new Promise(async (resolve, reject) => {
-  const { repo, spec } = await config({bootstrapFor: 'earth', sharding: true});
+  const { repo, spec } = await config({bootstrapFor: 'earth', sharding: true, relayHop: true});
   const dataSpecPath = join(networkPath, 'datastore_spec')
   ipfsRepo.init(repo, async error => {
     if (error) reject(error);
