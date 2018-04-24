@@ -9,7 +9,7 @@ export const networks = {
 };
 
 export const signalServers = [
-  '/ip4/192.168.0.10/tcp/4002/ipfs/QmXN5cqP2rd38f2zsDjAM2Y4geXF3jegEma392fdSohfx3'
+  '/ip4/84.193.79.27/tcp/4002/ipfs/QmXN5cqP2rd38f2zsDjAM2Y4geXF3jegEma392fdSohfx3'
 ]
 
 export const olivia = process.argv.includes('olivia') || process.argv.includes('testnet');

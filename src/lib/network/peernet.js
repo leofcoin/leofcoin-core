@@ -56,12 +56,13 @@ export const resolvePeers = () => new Promise(resolve => {
 
 export const _connect = async addresses =>
   new Promise(async (resolve, reject) => {
+    // TODO: ignore address after 5 times
     try {
       await ipfs.swarm.connect(addresses);
       resolve();
     } catch (e) {
       fail(e.message);
-      debug('trying again')
+      debug('trying again');
       return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
     }
   });
@@ -71,7 +72,7 @@ export const connectBootstrap = async addresses => {
 
   await _connect(signalServers);
 
-  succes(`connected to ${1} bootstrap peer(s)`);
+  succes(`connected to ${signalServers.length} bootstrap peer(s)`);
 }
 export const connect = (addresses = []) => new Promise(async (resolve, reject) => {
   try {
