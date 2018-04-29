@@ -76,9 +76,9 @@ export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
-export const genesisCID = '12200000248bfb7fea0ba4ff67b3ff7370c0683cc8cdab540a47766e147fa3b58566'; // // TODO: should be hardcoded
+export const genesisCID = '1220000026e43a85c01ab04183ecce485637ac15d7423bea5fd0a72019da9afe2936'; // // TODO: should be hardcoded
 
-export const GENESISBS58 = 'CtoFKgJCQ46vL4WpCykNvRTu2RohfYe35c9ULjz2stMi3u47PmYmPX8LYBLA9r1QKufjkVW43EtRZ4pd7wRwhHNt7RmZMeN8hqU7XDJ4';
+export const GENESISBS58 = 'uVd8DSSuJkh8P8WbMsUTknyidJV8V8eUBL8Pg8ijHbgQBnkjDVrKky5EWD19F3vY9uApjMkb47oah95qDrYXWqNbJzLKAWFaxdCmcjGFv';
 export const GENESISBLOCK = (() => {
 	const block = JSON.parse(Buffer.from(decode(GENESISBS58)).toString());
 	block.hash = genesisCID.substring(4);

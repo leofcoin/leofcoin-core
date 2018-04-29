@@ -100,7 +100,9 @@ export const transformBlock = ({multihash, data}) => {
 // TODO: global peerlist
 export const longestChain = () => new Promise(async (resolve, reject) => {
   try {
-    const addrs = Array.from(global.peerset.entries()).map(peer => peer[1])
+    const peers = await resolvePeers();
+    // transform peers into valid ipfs addresses
+    const addrs = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
     // peers.push(id);
     const stats = [];
     for (const addr of addrs) {
