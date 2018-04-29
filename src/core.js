@@ -5,8 +5,8 @@ import { join } from 'path';
 import './server/index';
 import { connect, connectBootstrap } from './lib/network/peernet';
 import { DAGChain } from './lib/dagchain/dagchain';
-import { configPath } from './params';
-import { IPFSNode, cleanRepo, closeRepo } from './lib/network/ipfs-node';
+import { configPath, networkPath, network } from './params';
+import ipfsdNode from 'ipfsd-node';
 import { write } from 'crypto-io-fs';
 import ipfsStar from './lib/network/ipfs-star'
 
@@ -17,17 +17,26 @@ global.states = {
   mining: false
 };
 
-export const core = async ({ genesis, network }) => {
+export const core = async ({ genesis }) => {
 	try {
     const now = Date.now();
     const config = await getUserConfig;
     // const connection = await initConnection;
     const secure_now = Date.now();
     bus.emit('stage-one');
-    const { ipfsd } = await IPFSNode();
-    const { addresses } = await ipfsd.api.id();
+    const ipfsd = await ipfsdNode({
+      bootstrap: network,
+      sharding: true,
+      relayHop: true,
+      flags: ['--enable-pubsub-experiment'],
+      repoPath: networkPath,
+      cleanup: false
+    });
+
+    // TODO: flags should be configurable @ start
+    const { ipfs, addresses } = await ipfsd.start();
     await connectBootstrap();
-    const star = ipfsStar(addresses[0], network, ipfsd.api.pubsub)
+    const star = ipfsStar(addresses[0], ipfs.pubsub);
 
     const ipfsd_now = Date.now();
     process.on('SIGINT', async () => {
@@ -49,17 +58,17 @@ export const core = async ({ genesis, network }) => {
       log(`total load prep took ${(Date.now() - now) / 1000} seconds`);
     })
     await write(configPath, JSON.stringify(config, null, '\t'));
-    const chain = new DAGChain({ genesis, network, ipfs: ipfsd.api });
+    const chain = new DAGChain({ genesis, network, ipfs });
     await chain.init();    
 	} catch (e) {
     if (e.code === 'ECONNREFUSED' || e.message && e.message.includes('cannot acquire lock')) {
-      await cleanRepo();
+      // await cleanRepo();
       console.log('retrying');
-      return core({ genesis, network });
+      // return core({ genesis, network });
     }
 		console.error(`load-error::${e}`);
     process.exit()
 	}
 }
 
-export default core({genesis: false, network: 'leofcoin'})
+export default core({genesis: false})
