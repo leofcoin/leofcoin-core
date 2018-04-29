@@ -102,12 +102,17 @@ export const longestChain = () => new Promise(async (resolve, reject) => {
   try {
     const peers = await resolvePeers();
     // transform peers into valid ipfs addresses
-    const addrs = peers.map(({addr, peer}) => `${addr.toString()}/ipfs/${peer.toB58String()}`);
+    const addrs = peers.map(({addr, peer}) => {
+      return {
+        addr: addr.toString(),
+        id: peer.toB58String()
+      }
+    });
     // peers.push(id);
     const stats = [];
-    for (const addr of addrs) {
+    for (const { addr, id } of addrs) {
       try {
-        await ipfs.swarm.connect(addr);
+        await ipfs.swarm.connect(`${addr.toString()}/ipfs/${id}`);
         const ref = await ipfs.name.resolve(id);
         const hash = ref.replace('/ipfs/', '');
         // get chain stats for every peer
@@ -118,7 +123,7 @@ export const longestChain = () => new Promise(async (resolve, reject) => {
         if (e.code === 'ECONNREFUSED') {
           reject(e);
         }
-        console.log(`Ignoring ${addr}`)
+        console.log(`Ignoring ${id}`)
       }
     }
     // reduce to longest chain
