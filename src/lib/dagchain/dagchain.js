@@ -270,7 +270,7 @@ export class DAGChain extends EventEmitter {
         this.addBlock(block); // add to chain
       } catch (error) {
         // TODO: remove publish invalid-block
-        ipfs.pubsub.publish('invalid-block', new Buffer.from(JSON.stringify(block)));
+        this.ipfs.pubsub.publish('invalid-block', new Buffer.from(JSON.stringify(block)));
         bus.emit('invalid-block', block);
         return console.error(error);
       }
