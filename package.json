@@ -1,6 +1,6 @@
 {
   "name": "leofcoin-core",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "description": "leofcoin core library",
   "repository": "https://github.com/leofcoin-io/leofcoin-core",
   "author": "Glenn Vandeuren <vandeurenglenn@gmail.com>",
