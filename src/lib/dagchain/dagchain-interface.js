@@ -1,7 +1,8 @@
 import { config, median, multihashFromHex } from './../../utils';
 import { validateTransaction } from './../transaction.js';
 import { TransactionError } from './../errors.js';
-import { DAGBlock, createDAGNode, validate } from './dagblock';
+import { DAGBlock, validate } from './dagblock';
+import createDAGNode from './dagnode';
 import { encode, decode } from 'bs58';
 import { GENESISBLOCK } from '../../params';
 import { resolvePeers } from '../network/peernet';

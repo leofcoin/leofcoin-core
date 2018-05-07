@@ -1,5 +1,5 @@
-import { calculateHash } from './../dagchain/dagblock';
-import { getDifficulty } from '../../utils';
+import calculateHash from './../dagchain/calculate-hash';
+import getDifficulty from '../../difficulty';
 
 const hashes = nonce => {
 	const hashrates = [10000];

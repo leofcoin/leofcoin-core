@@ -3,30 +3,10 @@ import { validateTransactions, createRewardTransaction } from './../transaction'
 import { hexFromMultihash, getDifficulty } from './../../utils';
 import { isValid } from 'crypto-chain-validator';
 import { BlockError } from '../errors';
+import createDAGNode from  './dagnode';
+import calculateHash from  './calculate-hash';
 import IPFS from 'ipfs-api';
 const ipfs = new IPFS();
-
-const calculateHash = async block => {
-  block = await createDAGNode(block);
-  return block.multihash.toString('hex').substring(4);
-}
-
-const createDAGNode = ({index, prevHash, time, transactions, nonce}) => {
-  return new Promise((resolve, reject) => {
-    DAGNode.create(JSON.stringify({
-      index,
-      prevHash,
-      time,
-      transactions,
-      nonce
-    }), [], 'sha2-256', (error, dagNode) => {
-      if (error) {
-        return reject(error);
-      }
-      return resolve(dagNode)
-    });
-  });
-}
 
 /**
  * Create new block
@@ -90,7 +70,5 @@ const validate = async (previousBlock, block, difficulty, unspent) => {
 
 export {
   DAGBlock,
-  validate,
-  calculateHash,
-  createDAGNode
+  validate
 };

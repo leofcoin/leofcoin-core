@@ -1,4 +1,5 @@
-import { config, getDifficulty, hashLog, median } from './../utils';
+import { config, hashLog, median } from './../utils';
+import getDifficulty from '../difficulty';
 import { BlockError, TransactionError, MinerWarning } from './errors';
 import { StoreHandler } from 'crypto-store';
 import { nextBlock, difficulty } from './dagchain/dagchain-interface';
