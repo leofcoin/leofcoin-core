@@ -20,20 +20,19 @@
   "esdoc": {
     "source": "./src",
     "destination": "./docs",
+    "experimentalProposal": {
+      "classProperties": true,
+      "objectRestSpread": true,
+      "decorators": true,
+      "doExpressions": true,
+      "functionBind": true,
+      "asyncGenerators": true,
+      "exportExtensions": true,
+      "dynamicImport": true
+    },
     "plugins": [
       {
-        "name": "esdoc-ecmascript-proposal-plugin",
-        "option": {
-          "classProperties": true,
-          "objectRestSpread": true,
-          "doExpressions": true,
-          "functionBind": true,
-          "functionSent": true,
-          "asyncGenerators": true,
-          "decorators": true,
-          "exportExtensions": true,
-          "dynamicImport": true
-        }
+        "name": "esdoc-standard-plugin"
       }
     ]
   },
@@ -63,7 +62,7 @@
   },
   "devDependencies": {
     "esdoc": "^1.1.0",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "eslint": "^4.17.0",
     "npm-run-all": "^4.1.2",
     "rollup": "^0.57.1",

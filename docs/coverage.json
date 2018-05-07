@@ -1,0 +1,295 @@
+{
+  "coverage": "16.21%",
+  "expectCount": 185,
+  "actualCount": 30,
+  "files": {
+    "src/params.js": {
+      "expectCount": 28,
+      "actualCount": 0,
+      "undocumentLines": [
+        29,
+        82,
+        81,
+        96,
+        75,
+        77,
+        78,
+        28,
+        79,
+        66,
+        68,
+        87,
+        67,
+        32,
+        63,
+        65,
+        54,
+        44,
+        13,
+        64,
+        8,
+        27,
+        76,
+        73,
+        74,
+        45,
+        42,
+        18
+      ]
+    },
+    "src/lib/errors.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        1,
+        13,
+        4,
+        5,
+        8
+      ]
+    },
+    "src/server/socket-server.js": {
+      "expectCount": 16,
+      "actualCount": 0,
+      "undocumentLines": [
+        22,
+        6,
+        24,
+        23,
+        90,
+        103,
+        95,
+        61,
+        86,
+        82,
+        111,
+        107,
+        99,
+        71,
+        116,
+        75
+      ]
+    },
+    "src/lib/wallet.js": {
+      "expectCount": 16,
+      "actualCount": 4,
+      "undocumentLines": [
+        11,
+        68,
+        58,
+        12,
+        81,
+        20,
+        27,
+        38,
+        49,
+        77,
+        86,
+        94
+      ]
+    },
+    "src/lib/dagchain/dagblock.js": {
+      "expectCount": 11,
+      "actualCount": 2,
+      "undocumentLines": [
+        9,
+        40,
+        14,
+        49,
+        64,
+        46,
+        65,
+        68,
+        59
+      ]
+    },
+    "src/lib/dagchain/dagchain.js": {
+      "expectCount": 29,
+      "actualCount": 3,
+      "undocumentLines": [
+        16,
+        191,
+        263,
+        35,
+        31,
+        63,
+        23,
+        39,
+        36,
+        104,
+        90,
+        17,
+        20,
+        186,
+        166,
+        44,
+        45,
+        71,
+        119,
+        67,
+        59,
+        128,
+        146,
+        255,
+        215,
+        206
+      ]
+    },
+    "src/lib/bus.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        3,
+        4,
+        9
+      ]
+    },
+    "src/lib/miner.js": {
+      "expectCount": 14,
+      "actualCount": 3,
+      "undocumentLines": [
+        11,
+        24,
+        17,
+        13,
+        67,
+        127,
+        58,
+        25,
+        56,
+        62,
+        20
+      ]
+    },
+    "src/utils.js": {
+      "expectCount": 21,
+      "actualCount": 3,
+      "undocumentLines": [
+        148,
+        41,
+        59,
+        243,
+        63,
+        130,
+        104,
+        233,
+        98,
+        51,
+        114,
+        237,
+        212,
+        204,
+        162,
+        55,
+        78,
+        92
+      ]
+    },
+    "src/lib/ccp-block.js": {
+      "expectCount": 5,
+      "actualCount": 5,
+      "undocumentLines": []
+    },
+    "src/lib/hash.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "src/lib/dagchain/dagchain-interface.js": {
+      "expectCount": 14,
+      "actualCount": 2,
+      "undocumentLines": [
+        15,
+        66,
+        63,
+        35,
+        41,
+        46,
+        60,
+        143,
+        101,
+        17,
+        152,
+        94
+      ]
+    },
+    "src/lib/network/ipfs-mock.js": {
+      "expectCount": 5,
+      "actualCount": 0,
+      "undocumentLines": [
+        4,
+        34,
+        29,
+        24,
+        9
+      ]
+    },
+    "src/lib/network/peernet.js": {
+      "expectCount": 3,
+      "actualCount": 0,
+      "undocumentLines": [
+        77,
+        69,
+        41
+      ]
+    },
+    "src/controller.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        46
+      ]
+    },
+    "src/core.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        20
+      ]
+    },
+    "src/server/core-requests.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        138
+      ]
+    },
+    "src/lib/transaction.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    },
+    "src/lib/network/secure-client-connection.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        9
+      ]
+    },
+    "src/ipfs-keep-alive.js": {
+      "expectCount": 2,
+      "actualCount": 0,
+      "undocumentLines": [
+        2,
+        1
+      ]
+    },
+    "src/lib/network/ipfs-star.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "src/lib/dagchain/genesis.js": {
+      "expectCount": 1,
+      "actualCount": 1,
+      "undocumentLines": []
+    },
+    "src/server/routes/wallet.js": {
+      "expectCount": 1,
+      "actualCount": 0,
+      "undocumentLines": [
+        9
+      ]
+    }
+  }
+}

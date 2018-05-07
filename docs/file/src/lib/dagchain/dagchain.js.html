@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">src/lib/dagchain/dagchain.js | API Document</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  
+  
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <a data-ice="repoURL" href="https://github.com/leofcoin-io/leofcoin-core" class="repo-url-github">Repository</a>
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-controller">controller</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-core">core</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ipfskeepalive">ipfskeepalive</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-localDAGMultiaddress">localDAGMultiaddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-allowFailureUntillEnough">allowFailureUntillEnough</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createNewAddress">createNewAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-debug">debug</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fail">fail</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getDifficulty">getDifficulty</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-groupCollapsed">groupCollapsed</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashLog">hashLog</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hashes">hashes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hexFromMultihash">hexFromMultihash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-interval">interval</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-log">log</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-median">median</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-multihashFromHex">multihashFromHex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-net">net</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-networkAddress">networkAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-newWallet">newWallet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-succes">succes</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-textlog">textlog</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-timeout">timeout</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-twelveHours">twelveHours</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-AppData">AppData</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-GENESISBLOCK">GENESISBLOCK</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-GENESISBS58">GENESISBS58</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-checkpoints">checkpoints</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-configPath">configPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-consensusSubsidyInterval">consensusSubsidyInterval</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-consensusSubsidyPercentage">consensusSubsidyPercentage</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-genesis">genesis</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-genesisCID">genesisCID</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-localCurrent">localCurrent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-localDAGAddress">localDAGAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-localIndex">localIndex</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mainNethash">mainNethash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-netKey">netKey</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-netKeyPath">netKeyPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-netKeys">netKeys</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-netPrefix">netPrefix</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-network">network</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networkPath">networkPath</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-networks">networks</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-olivia">olivia</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-reward">reward</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-seed">seed</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-seeds">seeds</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-signalServers">signalServers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-testNethash">testNethash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-verbose">verbose</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-config">config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-getUserConfig">getUserConfig</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lib</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/bus.js~Emitter.html">Emitter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/errors.js~TransactionError.html">TransactionError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/miner.js~Miner.html">Miner</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/wallet.js~CryptoWallet.html">CryptoWallet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-block">block</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-blockDifficulty">blockDifficulty</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-difficulty">difficulty</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genesisBlock">genesisBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateBlock">validateBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-BlockError">BlockError</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-MinerWarning">MinerWarning</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-calculateBlockHash">calculateBlockHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-transactionHash">transactionHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-transactionInputHash">transactionInputHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createRewardTransaction">createRewardTransaction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateTransaction">validateTransaction</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validateTransactions">validateTransactions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-emitter">emitter</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lib/dagchain</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/dagchain/dagblock.js~DAGBlock.html">DAGBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/dagchain/dagchain.js~DAGChain.html">DAGChain</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-calculateHash">calculateHash</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-createDAGNode">createDAGNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-validate">validate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-difficulty">difficulty</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getBalanceForAddress">getBalanceForAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTransactions">getTransactions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getTransactionsForAddress">getTransactionsForAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnspent">getUnspent</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-getUnspentForAddress">getUnspentForAddress</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-lastBlock">lastBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-longestChain">longestChain</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-newGenesisDAGNode">newGenesisDAGNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-nextBlock">nextBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-nextBlockTransactions">nextBlockTransactions</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-transformBlock">transformBlock</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-newGenesisDAGNode">newGenesisDAGNode</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-chain">chain</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-mempool">mempool</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">lib/network</div><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-id">id</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ipfsstar">ipfsstar</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connect">connect</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-connectBootstrap">connectBootstrap</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-resolvePeers">resolvePeers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-config">config</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-name">name</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-pubsub">pubsub</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-swarm">swarm</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-initConnection">initConnection</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">server</div><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/server/socket-server.js~ClientConnection.html">ClientConnection</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-corerequests">corerequests</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-clientResponse">clientResponse</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-socketserver">socketserver</a></span></span></li>
+<li data-ice="doc"><div data-ice="dirPath" class="nav-dir-path">server/routes</div><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-router">router</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/dagchain/dagchain.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { DAGNode } from &apos;ipld-dag-pb&apos;;
+import { decode, encode } from &apos;bs58&apos;;
+import EventEmitter from &apos;events&apos;;
+import { chain, difficulty, getUnspent, longestChain, lastBlock, newGenesisDAGNode } from &apos;./dagchain-interface&apos;;
+import { DAGBlock, createDAGNode, validate } from &apos;./dagblock&apos;;
+import { read, write } from &apos;crypto-io-fs&apos;;
+import { join } from &apos;path&apos;;
+import { genesis, network, genesisCID, localIndex, localCurrent, localDAGAddress, localDAGMultiaddress, networks } from &apos;./../../params&apos;;
+import { debug, hashFromMultihash, multihashFromHex, succes, log } from &apos;./../../utils&apos;;
+import bus from &apos;./../bus&apos;;
+// import ipfsKeepAlive from &apos;./../../ipfs-keep-alive&apos;;
+// import bitswap from &apos;ipfs-bitswap&apos;;
+// TODO: implement bitswap
+// export const ipfs = (() =&gt; new IPFS())();
+
+export class DAGChain extends EventEmitter {
+  get link() {
+    return this.name.replace(&apos;/ipfs/&apos;, &apos;&apos;)
+  }
+  get links() {
+    return this.node ? this.node.links : [];
+  }
+  get index() {
+    const links = [];
+    this.links.forEach(link =&gt; {
+
+      links[link.name] = link;
+    });
+    return links.length &gt; 0 ? links : [];
+  }
+  constructor({ipfs}) {
+    super();
+    this.announceBlock = this.announceBlock.bind(this);
+
+    this.chain = chain;
+    this.ipfs = ipfs;
+  }
+
+  init() {
+    return new Promise(async (resolve, reject) =&gt; {
+      try {
+        await this.ipfs.pubsub.subscribe(&apos;block-added&apos;, this.announceBlock);
+        const { hash } = await longestChain();
+        this.name = hash || await localDAGMultiaddress();
+        this.node = await this.get(this.link);
+        log(`Running on the ${network} network`);
+        await this.loadChain();
+      } catch (error) {
+        // TODO: finishe the genesis module
+        if (genesis) {
+          log(`Creating genesis block on the ${network} network`);
+          await this.newDAGChain();
+        } else {
+          reject(error)
+        }
+      }
+    });
+  }
+  async resolve(name) {
+    return await this.ipfs.name.resolve(name, {recursive: true});
+  }
+
+  async get(multihash) {
+    return await this.ipfs.object.get(multihash);
+  }
+
+  async put(DAGNode) {
+    return await this.ipfs.object.put(DAGNode);
+  }
+
+  async pin(multihash) {
+    return new Promise(async (resolve, reject) =&gt; {
+      try {
+        await this.ipfs.pin.add(multihash);
+        resolve();
+      } catch (e) {
+        reject(e)
+      }
+    });
+  }
+
+  /**
+   * addLink
+   */
+  async addLink(multihash, link) {
+    const newDAGChain = await this.ipfs.object.patch.addLink(multihash, link);
+    return await this.publish(encode(newDAGChain.multihash));
+  }
+
+  async lastLink() {
+    try {
+      await this.sync();
+      const height = Number(this.links.length) - 1;
+      for (const link of this.links) {
+        if (Number(link.name) === height) {
+          return link.multihash;
+        }
+      }
+    } catch (e) {
+      console.error(&apos;Sync Error::&apos;, e);
+    }
+  }
+  // TODO: decentralize
+  async lastBlock() {
+    const lastLink = await this.lastLink();
+    return await new DAGBlock(lastLink);
+  }
+
+  /**
+   * resolves to the latest chainObject
+   */
+  async sync() {
+    const { hash } = await longestChain();
+    this.name = hash || await localDAGMultiaddress();
+    this.node = await this.get(this.link);
+    return this.link;
+  }
+
+  async publish(multihash) {
+    const published = await this.ipfs.name.publish(multihash);
+    if (this.name) {
+      await this.sync();
+    }
+    await this.pin(published[&apos;value&apos;]);
+    return published[&apos;name&apos;]  // only needed when creating genesis block
+  }
+
+  async resolveBlocks(multihash, index) {
+    try {
+      let block = await new DAGBlock(encode(multihash));
+      if (block.index &gt; index) {
+        await this.pin(encode(multihash)); // pin block locally
+        console.log(`added block: ${block.index}  ${block.hash}`);
+      }
+      chain[block.index] = block;
+      console.log(`loaded block: ${block.index}  ${block.hash}`);
+      if (block.prevHash &amp;&amp; block.prevHash.length &gt; 3) {
+        return this.resolveBlocks(Buffer.from(`1220${block.prevHash}`, &apos;hex&apos;), index);
+      }
+      return;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async syncChain() {
+    try {
+      bus.emit(&apos;syncing&apos;, true);
+      if (this.index) {
+        const { index, prevHash } = await this.localBlock();
+        const height = this.index.length - 1;
+        let syncCount = height - index;
+        const multihash = this.index[height].multihash;
+        log(`syncing ${syncCount} blocks`)
+        await this.resolveBlocks(multihash, index);
+        await this.updateLocals(multihash.toString(&apos;hex&apos;), height, this.link);
+        await this.publish(this.link);
+      }
+      bus.emit(&apos;syncing&apos;, false);
+    } catch (e) {
+      console.error(&apos;syncChain&apos;, e);
+    }
+
+  }
+
+  async localBlock() {
+    try {
+      const CID = await read(localCurrent, &apos;string&apos;); // read local chain state
+      const multihash = encode(new Buffer(CID, &apos;hex&apos;));
+      const current = await this.get(multihash);
+      const { index } = JSON.parse(current.data.toString());
+      debug(`current local block CID ${CID}`);
+      debug(`current local dag: ${multihash}`);
+      return {
+        index,
+        multihash,
+        CID
+      }
+    } catch (e) {
+      const CID = await this.get(encode(new Buffer(genesisCID, &apos;hex&apos;)));
+      await write(localCurrent, CID.multihash.toString(&apos;hex&apos;));
+      return await this.localBlock();
+    }
+  }
+
+  async loadChain() {
+    await this.syncChain();
+    bus.emit(&apos;ready&apos;, true);
+  }
+
+  addBlock(block) {
+    return new Promise(async (resolve, reject) =&gt; {
+      log(`add block: ${block.index}  ${block.hash}`);
+      chain[block.index] = block;
+      bus.emit(&apos;block-added&apos;, block);
+      await this.pin(multihashFromHex(block.hash)); // pin block locally
+      await this.updateLocals(`1220${block.hash}`, block.index, this.link);
+      try {
+        await this.publish(this.link);
+      } catch (e) {
+        console.warn(e);
+      }
+    });
+  }
+  // TODO: write using ipfs.files.write
+  writeLocals(CID, index, DAGAdress) {
+    return new Promise(async (resolve, reject) =&gt; {
+      await write(localIndex, JSON.stringify(index));
+      await write(localCurrent, CID);
+      await write(localDAGAddress, DAGAdress);
+      resolve();
+    });
+  }
+
+  updateLocals(CID, height, DAGAdress) {
+    return new Promise(async (resolve, reject) =&gt; {
+      try {
+        const index = await read(localIndex, &apos;json&apos;);
+        index.push([height, CID]);
+        await this.writeLocals(CID, index, DAGAdress);
+      } catch (error) {
+        await this.writeLocals(CID, [[height, CID]], DAGAdress);
+      }
+      resolve();
+    });
+  }
+
+  /**
+   * Initialize a new chain on the IPFS network
+   * Creates creates &amp; saves the genesisBlock to IPFS, blocks are pinned so they aren&apos;t removeable on the local side.
+   *
+   * @param {object} block The genesis block to write
+   * @setup PART of Easy setup your own blockchain, more info URL...
+   */
+  async newDAGChain() {
+    try {
+      const genesisDAGNode = await newGenesisDAGNode(difficulty());
+      const block = await this.put(genesisDAGNode);
+      // await this.pin(encode(block.multihash));
+      const chainDAG = await this.ipfs.object.new(&apos;unixfs-dir&apos;);
+      const height = JSON.parse(genesisDAGNode.data.toString()).index;
+      const newDAGChain = await this.ipfs.object.patch.addLink(chainDAG.multihash, {name: height, size: block.size, multihash: block.multihash});
+      const CID = block.multihash.toString(&apos;hex&apos;); // The CID as an base58 string
+      await this.updateLocals(CID, 0, encode(newDAGChain.multihash))
+      succes(&apos;genesisBlock created&apos;);
+      log(`genesisBlock: ${block.data.toString()}`);
+      log(`genesis: ${encode(block.data)}\nCID:\t${CID}`);
+      log(`DAGChain name ${encode(newDAGChain.multihash)}`);
+      return;
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async updateLocalChain(block) {
+    const dagnode = await new DAGBlock().put(block);
+    await this.addLink(this.link, {name: block.index, size: dagnode.size, multihash: dagnode.multihash});
+    return;
+  }
+
+  // TODO: go with previous block instead off lastBlock
+  // TODO: validate on sync ...
+  async announceBlock({data, from}) {
+      const block = JSON.parse(data.toString());
+      try {
+        // const previousBlock = await lastBlock(); // test
+        await validate(chain[chain.length - 1], block, difficulty(), getUnspent());
+        // await this.sync();
+        await this.updateLocalChain(block);
+        this.addBlock(block); // add to chain
+      } catch (error) {
+        // TODO: remove publish invalid-block
+        this.ipfs.pubsub.publish(&apos;invalid-block&apos;, new Buffer.from(JSON.stringify(block)));
+        bus.emit(&apos;invalid-block&apos;, block);
+        return console.error(error);
+      }
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(0.5.2)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
