@@ -1,4 +1,3 @@
-// import { initConnection } from './lib/network/secure-client-connection';
 import { getUserConfig, debug, allowFailureUntillEnough, log, groupCollapsed } from './utils';
 import bus from './lib/bus';
 import { join } from 'path';
@@ -21,7 +20,6 @@ export const core = async ({ genesis }) => {
 	try {
     const now = Date.now();
     const config = await getUserConfig;
-    // const connection = await initConnection;
     const secure_now = Date.now();
     bus.emit('stage-one');
     const ipfsd = await ipfsdNode({
@@ -67,7 +65,7 @@ export const core = async ({ genesis }) => {
       // return core({ genesis, network });
     }
 		console.error(`load-error::${e}`);
-    process.exit()
+    // process.exit()
 	}
 }
 

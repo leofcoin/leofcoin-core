@@ -88,7 +88,6 @@ export class ClientConnection {
 	}
 
 	onBlockAdded(data) {
-  	console.log(data.transactions);
   	this.send({type: 'blockchain', name: 'block-added', data});
 	}
 

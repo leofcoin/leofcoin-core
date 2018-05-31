@@ -118,9 +118,9 @@ export class DAGChain extends EventEmitter {
 
   async publish(multihash) {
     const published = await this.ipfs.name.publish(multihash);
-    if (this.name) {
-      await this.sync();
-    }
+    // if (this.name) {
+    //   await this.sync();
+    // }
     await this.pin(published['value']);
     return published['name']  // only needed when creating genesis block
   }
@@ -193,13 +193,20 @@ export class DAGChain extends EventEmitter {
       log(`add block: ${block.index}  ${block.hash}`);
       chain[block.index] = block;
       bus.emit('block-added', block);
+      await this.sync();
       await this.pin(multihashFromHex(block.hash)); // pin block locally
       await this.updateLocals(`1220${block.hash}`, block.index, this.link);
+
       try {
         await this.publish(this.link);
       } catch (e) {
         console.warn(e);
       }
+
+      block.transactions.forEach(transaction => {
+        const index = mempool.indexOf(transaction)
+        mempool.splice(index)
+      })
     });
   }
   // TODO: write using ipfs.files.write

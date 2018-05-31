@@ -5,9 +5,11 @@ import { TransactionError } from './errors.js';
 import { transactionInputHash, transactionHash } from './hash.js';
 import {chain, mempool} from './dagchain/dagchain';
 import { randomBytes } from 'crypto';
-import ecdsa from 'ecdsa';
-const { sign, verify } = ecdsa;
-import bs58 from 'bs58';
+import { encode, decode } from 'bs58';
+import { getUnspentForAddress } from './dagchain/dagchain-interface';
+import MultiHDWallet from './multi-hd-wallet';
+import { network } from '../params.js';
+
 /**
  * validate transaction
  *
@@ -15,28 +17,31 @@ import bs58 from 'bs58';
  * @param unspent
  */
 export const validateTransaction = (transaction, unspent) => {
-	if (!isValid('transaction', transaction)) throw new TransactionError('Invalid transaction');
-	if (transaction.hash !== transactionHash(transaction)) throw new TransactionError('Invalid transaction hash');
-
+	// if (!isValid('transaction', transaction)) throw new TransactionError('Invalid transaction');
+	if (transaction.hash !== transactionHash(transaction)) throw TransactionError('Invalid transaction hash');
+	const wallet = new MultiHDWallet(network);
+	// TODO: versions should be handled here...
 	// Verify each input signature
 	transaction.inputs.forEach(input => {
-		if (!verifySignature(input.address, input.signature, transactionHash(input)))
-			throw new TransactionError('Invalid input signature');
+  	const { signature, address } = input;
+		const hash = transactionInputHash(input);
+		if (!wallet.verify(signature, hash, address))
+			throw TransactionError('Invalid input signature');
 	});
 
 	// Check if inputs are in unspent list
 	transaction.inputs.forEach((input) => {
-		if (! unspent.find(out => out.tx === input.tx && out.index === input.index)) { throw new TransactionError('Input has been already spent: ' + input.tx); }
+		if (! unspent.find(out => out.tx === input.tx && out.index === input.index)) { throw TransactionError('Input has been already spent: ' + input.tx); }
 	});
 
 	if (transaction.reward) {
 		// For reward transaction: check if reward output is correct
-		if (transaction.outputs.length !== 1) throw new TransactionError('Reward transaction must have exactly one output');
-		if (transaction.outputs[0].amount !== config.reward) throw new TransactionError(`Mining reward must be exactly: ${config.reward}`);
+		if (transaction.outputs.length !== 1) throw TransactionError('Reward transaction must have exactly one output');
+		if (transaction.outputs[0].amount !== config.reward) throw TransactionError(`Mining reward must be exactly: ${config.reward}`);
 	} else {
 		// For normal transaction: check if total output amount equals input amount
 		if (transaction.inputs.reduce((acc, input) => acc + input.amount, 0) !==
-      transaction.outputs.reduce((acc, output) => acc + output.amount, 0)) { throw new TransactionError('Input and output amounts do not match'); }
+      transaction.outputs.reduce((acc, output) => acc + output.amount, 0)) { throw TransactionError('Input and output amounts do not match'); }
 	}
 
 	return true;
@@ -52,7 +57,7 @@ export const validateTransactions = (transactions, unspent) => {
 	for (const transaction of transactions) {
 		validateTransaction(transaction, unspent);
 		if (transactions.filter(transaction => transaction.reward).length !== 1)
-			throw new TransactionError('Transactions cannot have more than one reward');
+			throw TransactionError('Transactions cannot have more than one reward');
 	}
 };
 
@@ -97,15 +102,9 @@ export const createRewardTransaction = (address, height) => {
 	return newTransaction([], [{index: 0, amount: consensusSubsidy(height), address}], true);
 };
 
-/**
- * Sign transactionHash woth privateKey
- */
-const signHash = (hash, privateKey) => {
-	return sign(Buffer.from(hash, 'hex'), Buffer.from(privateKey)).signature.toString('base64');
-};
-
 const verifySignature = (address, signature, hash) => {
-	return verify(Buffer.from(hash, 'hex'), Buffer.from(signature, 'base64'), decode(address));
+	const wallet = new MultiHDWallet(network);
+	return wallet.verify(signature, hash, address);
 };
 
 /**
@@ -122,10 +121,11 @@ const createInput = (tx, index, amount, wallet) => {
 		tx,
 		index,
 		amount,
-		address: wallet.public,
+		address: wallet.address,
 	};
-	input.signature = signHash(transactionInputHash(input), wallet.private);
-
+	// TODO: show notification the tx got signed
+	// Sign transactionHash
+	input.signature = wallet.sign(transactionInputHash(input));
 	return input;
 };
 
@@ -138,22 +138,22 @@ const createInput = (tx, index, amount, wallet) => {
  * @param unspent
  * @return {id, reward, inputs, outputs, hash,}
  */
-const buildTransaction  = (wallet, toAddress, amount, unspent) => {
+export const buildTransaction  = (wallet, toAddress, amount) => {
 	let inputsAmount = 0;
+	const unspent = getUnspentForAddress(wallet.address);
 	const inputsRaw = unspent.filter(i => {
 		const more = inputsAmount < amount;
 		if (more) inputsAmount += i.amount;
 		return more;
 	});
-	if (inputsAmount < amount) throw new TransactionError('Not enough funds');
-
+	if (inputsAmount < amount) throw TransactionError('Not enough funds');
+	// TODO: Add multiSigning
 	const inputs = inputsRaw.map(i => createInput(i.tx, i.index, i.amount, wallet));
-
 	// Send amount to destination address
 	const outputs = [{index: 0, amount, address: toAddress}];
 	// Send back change to my wallet
 	if (inputsAmount - amount > 0) {
-		outputs.push({index: 1, amount: inputsAmount - amount, address: wallet.public});
+		outputs.push({index: 1, amount: inputsAmount - amount, address: wallet.address});
 	}
 
 	return newTransaction(inputs, outputs);

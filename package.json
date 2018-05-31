@@ -13,7 +13,7 @@
   "scripts": {
     "build": "rollup -c",
     "start": "node dist/commonjs/core.js --network olivia",
-    "test": "node test.js",
+    "test": "node test/index.js",
     "watch": "rollup -c -w",
     "dev": "npm-run-all --parallel start watch"
   },
@@ -38,6 +38,8 @@
     ]
   },
   "dependencies": {
+    "big-integer": "^1.6.28",
+    "bip39": "^2.5.0",
     "bitcoinjs-lib": "^3.3.2",
     "bs58": "^4.0.1",
     "cors": "^2.8.4",
@@ -49,14 +51,19 @@
     "ecdsa": "^0.7.0",
     "express": "^4.16.3",
     "fs-ext": "^1.0.0",
+    "go-ipfs-dep": "^0.4.14",
     "ip-monitor": "^0.1.2",
     "ipfsd-node": "^0.1.2",
     "ipld-dag-pb": "^0.11.4",
     "leofcoin-hash": "^0.1.0",
+    "multi-signature": "^0.1.0",
+    "multi-wallet": "^0.1.1",
     "normalize-newline": "^3.0.0",
     "randombytes": "^2.0.6",
     "secp256k1": "^3.4.0",
-    "websocket": "^1.0.25"
+    "socket-request": "^0.1.2",
+    "websocket": "^1.0.25",
+    "wif": "^2.0.6"
   },
   "devDependencies": {
     "esdoc": "^1.1.0",
@@ -67,6 +74,7 @@
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-resolve": "^3.0.2",
+    "rollup-plugin-uglify": "^3.0.0",
     "tape": "^4.8.0"
   }
 }

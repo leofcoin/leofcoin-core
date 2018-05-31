@@ -118,6 +118,23 @@ const handleStatusRequest = async ({name, params}) => {
   return response;
 }
 
+const handleBlockRequest = async ({name, params}) => {
+  const response = {status: 409, data: null};
+  // get state from the global states object
+  switch (name) {
+    case 'get':
+
+      break;
+    default:
+
+  }
+  if (typeof state === 'boolean') {
+    response.data = state;
+    response.status = 200;
+  }
+  return response;
+}
+
 export default async ({type, name, params}) => {
   switch (type) {
     case 'miner':
@@ -126,5 +143,8 @@ export default async ({type, name, params}) => {
     case 'status':
       return handleStatusRequest({name, params});
       break;
+      case 'chain':
+      return handleBlockRequest({name, params});
+    break;
   }
 }

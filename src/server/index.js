@@ -7,6 +7,7 @@ import params from './../params';
 import wallet from './routes/wallet';
 import socketServer from './socket-server';
 import { chain } from '../lib/dagchain/dagchain-interface';
+import './new-socket-server';
 // internal server for communicating with system fs
 const core = express();
 const server = Server(core);

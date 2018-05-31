@@ -1,4 +1,3 @@
-import { DAGNode } from 'ipld-dag-pb';
 import { validateTransactions, createRewardTransaction } from './../transaction';
 import { hexFromMultihash, getDifficulty } from './../../utils';
 import { isValid } from 'crypto-chain-validator';
@@ -24,7 +23,6 @@ class DAGBlock {
 	}
 
 	async newBlock({transactions, previousBlock, address}) {
-		transactions = transactions.slice();
 		transactions.push(createRewardTransaction(address, previousBlock.index + 1));
 		this.data = {
 			index: previousBlock.index + 1,

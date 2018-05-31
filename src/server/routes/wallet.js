@@ -1,30 +1,22 @@
 import { Router } from 'express';
 import { join } from 'path';
 import { homedir } from 'os';
+import MultiWallet from 'multi-wallet';
 import { read, write } from 'crypto-io-fs';
 import { CryptoWallet } from '../../lib/wallet';
 import { getBalanceForAddress } from './../../lib/dagchain/dagchain-interface';
 import { debug } from '../../utils';
+import { APPDATAPATH, network } from '../../params';
 
 const router = Router();
 
-const APPDATAPATH = (() => {
-  switch (process.platform) {
-    case 'win32':
-      return join(homedir(), 'AppData', 'Roaming', 'Leofcoin')
-      break;
-    case 'linux':
-      return join(homedir(), '.leofcoin')
-      break;
-    case 'darwin':
-      // TODO: implement darwin path
-      break;
-    case 'android':
-      // TODO: implement android path
-      // experimental
-      break;
-  }
-})();
+const loadWallet = async () => {
+  const saved = await read(join(APPDATAPATH, 'wallet.dat'), 'string');
+  const wallet = new MultiWallet(network);
+  console.log(saved, network);
+  wallet.import(saved);
+  return wallet;
+}
 
 // TODO: encrypt/decrypt
 router.get('/core/new-wallet', async (request, response) => {
@@ -48,12 +40,13 @@ router.get('/core/new-wallet', async (request, response) => {
 
 router.get('/core/wallet', async (request, response) => {
   try {
-    const wallet = await read(join(APPDATAPATH, 'wallet.dat'), 'json');
+    const wallet = await read(join(APPDATAPATH, 'wallet.dat'), 'string');
     response.status(200).send(wallet)
   } catch (error) {
     if (error.code === 'ENOENT') {
       return response.redirect('/core/new-wallet');
     }
+    console.log(error);
     response.status(409).send(error);
   }
 });
@@ -74,8 +67,9 @@ router.get('/core/new-address', async (request, response) => {
 
 router.get('/core/addresses', async (request, response) => {
   try {
-    const addresses = await read(join(APPDATAPATH, 'addresses.dat'), 'buffer');
-    response.status(200).send(addresses);
+    const wallet = await loadWallet();
+    const account = wallet.derive('m/0\'/0/0');
+    response.status(200).send([['external', account.address]]);
   } catch (error) {
     if (error.code === 'ENOENT') {
       return response.redirect('/core/new-wallet');

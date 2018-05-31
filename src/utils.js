@@ -1,11 +1,10 @@
 'use strict';
 import { read, write } from 'crypto-io-fs';
-import { configPath, olivia, network } from './params';
+import { configPath } from './params';
 import { encode } from 'bs58';
-import CryptoWallet from './lib/wallet';
 import chalk from 'chalk';
-import { homedir } from 'os';
-import { join } from 'path';
+import { generateWallet, writeWallet } from './lib/wallet-utils';
+import bus from './lib/bus';
 
 if (process.platform === 'win32') {
   const readLine = require('readline').createInterface({
@@ -17,24 +16,6 @@ if (process.platform === 'win32') {
     process.emit('SIGINT');
   });
 };
-
-const APPDATAPATH = (() => {
-  switch (process.platform) {
-    case 'win32':
-      return join(homedir(), 'AppData', 'Roaming', 'Leofcoin', olivia ? 'olivia' : '')
-      break;
-    case 'linux':
-      return join(homedir(), '.leofcoin', olivia ? 'olivia' : '')
-      break;
-    case 'darwin':
-      // TODO: implement darwin path
-      break;
-    case 'android':
-      // TODO: implement android path
-      // experimental
-      break;
-  }
-})();
 
 // hardcode debug param for now
 process.env.DEBUG = true;
@@ -158,73 +139,18 @@ export const config = {
 	peers: []
 };
 
-
-export const newWallet = ( name= 'main') => new Promise(async (resolve, reject) => {
-  try {
-    const wallet = new CryptoWallet(network);
-    wallet.new();
-    const addresses = JSON.stringify([[name, wallet.public]]);
-    await write(join(APPDATAPATH, 'wallet.dat'), JSON.stringify([
-      [name, {private: wallet.private, public: wallet.public}]
-    ]));
-    await write(join(APPDATAPATH, 'addresses.dat'), addresses);
-    resolve(wallet.public);
-  } catch (e) {
-    console.log(e);
-  } finally {
-  }
-})
-
-/**
- *
- */
-export const createNewAddress = (name = Math.random().toString(36).slice(-8)) => new Promise(async (resolve, reject) => {
-  // create new address
-  const wallet = new CryptoWallet(network);
-  wallet.new()
-  // get local addresses
-  try {
-    const walletAddresses = await read(join(APPDATAPATH, 'wallet.dat'), 'json');
-    const addresses = await read(join(APPDATAPATH, 'addresses.dat'), 'json');
-    const address = [name, wallet.public];
-    addresses.push(address);
-    walletAddresses.push([name, {private: wallet.private, public: wallet.public}])
-    await write(join(APPDATAPATH, 'wallet.dat'), JSON.stringify(walletAddresses));
-    await write(join(APPDATAPATH, 'addresses.dat'), JSON.stringify(addresses));
-    resolve(wallet.public);
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      const n = await newWallet(name)
-      resolve(n)
-    }
-    else {reject(error)};
-  }
-});
-
-export const networkAddress = async net => {
-  let address;
-  console.log(net);
-	if (net === 'olivia') address = await createNewAddress('main');
-  else address = await createNewAddress('main');
-  return address;	
-};
-
-export const net = () => {
-	const testnet = 'olivia';
-	const main = 'leofcoin';
-
-	if (process.argv[2] === testnet || process.argv[3] === testnet) {
-		return testnet;
-	}
-	return main;
-};
-
 const defaultConfig = async () => {
-  const address = await networkAddress(network)
-  console.log(address, 'address');
+  const wallet = generateWallet();
+  // TODO: prompt for password
+  bus.on('initial-setup', message => {
+    console.log(message);
+  })
+  bus.emit('initial', wallet.mnemonic);
+  await writeWallet(wallet.export());
+  const account = wallet.derive('m/0\'/0/0');
 	return {
   	miner: {
-  		address,
+  		address: account.address,
   		intensity: 1
   	}
   }

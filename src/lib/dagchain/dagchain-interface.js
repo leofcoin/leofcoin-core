@@ -8,14 +8,31 @@ import { GENESISBLOCK } from '../../params';
 import { resolvePeers } from '../network/peernet';
 import IPFS from 'ipfs-api';
 const ipfs = new IPFS();
+const invalidTransactions = {};
 
 global.chain = global.chain || [
   GENESISBLOCK
 ];
+global.mempool = global.mempool || [];
 
 export const chain = (() => global.chain)();
 
-export const mempool = (() => [])();
+export const mempool = (() => global.mempool)();
+
+// TODO: needs 3 nodes running
+const invalidTransaction = data => {
+  data = JSON.parse(data.toString());
+  const tx = invalidTransactions[data.tx];
+  let {count} = tx.count || 0;
+  if (count === 3) {
+    const memIndex = mempool.indexOf(data)
+    mempool.splice(memIndex)
+    delete invalidTransactions[data.tx];
+  } else {
+    invalidTransactions[data.tx].count++;
+  }
+}
+ipfs.pubsub.subscribe('invalid-transaction', invalidTransaction)
 
 /**
  * Get the transactions for the next Block
@@ -24,11 +41,15 @@ export const mempool = (() => [])();
  */
 export const nextBlockTransactions = () => {
 	const unspent = getUnspent(false);
-	return mempool.filter((transaction) => {
+	return mempool.filter(async (transaction) => {
 		try {
 			return validateTransaction(transaction, unspent);
 		} catch (e) {
-			if (! (e instanceof TransactionError)) throw e;
+      // TODO: push to pubus
+      ipfs.pubsub.publish('invalid-transaction', new Buffer.from(JSON.stringify(transaction)));
+
+      // TODO: notification... here or in errors propably best here...
+			console.error(e);
 		}
 	});
 };
@@ -151,9 +172,16 @@ export const lastBlock = async () => {
 };
 
 export const nextBlock = async address => {
-  const transactions = nextBlockTransactions();
-  const previousBlock = chain[chain.length - 1];
-  return await new DAGBlock({transactions, previousBlock, address});
+  let transactions;
+  let previousBlock;
+  try {
+    previousBlock = chain[chain.length - 1]; // TODO: await lastBlock
+    transactions = await nextBlockTransactions();
+  } catch (e) {
+    transactions = [];
+  } finally {
+    return await new DAGBlock({transactions, previousBlock, address});
+  }
 };
 
 /**

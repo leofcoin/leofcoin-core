@@ -7,10 +7,11 @@
  */
 const leofcoin = {
 	messagePrefix: '\u0019Leofcoin Signed Message:',
-	pubKeyHash: 48, // L
-	scriptHash: 55, // P
-	wif: 63, // S
-	bip32: { public: 33108450, private: 33107450 }
+	pubKeyHash: 0x30, // L
+	scriptHash: 0x37, // P
+	wif: 0x3F, // S
+	multiCodec: 0x3c4,
+	bip32: { public: 0x13BBF2D4, private: 0x13BBCBC4 }
 };
 
 /**
@@ -18,11 +19,12 @@ const leofcoin = {
  * @return {messagePrefix, pubKeyHash, scriptHash, wif, bip32}
  */
 const olivia = {
-	messagePrefix: '\u0019Olivia Signed Message:',
-	pubKeyHash: 115, // o
-	scriptHash: 118, // p
-	wif: 125, // s
-	bip32: { public: 33108400, private: 33107350 }
+	messagePrefix: '\u0019Leofcoin Signed Message:',
+	pubKeyHash: 0x73, // o
+	scriptHash: 0x76, // p
+	wif: 0x7D, // s
+	multiCodec: 0x7c4,
+	bip32: { public: 0x13BBF2D5, private: 0x13BBCBC5 }
 };
 
 const bitcoin = {

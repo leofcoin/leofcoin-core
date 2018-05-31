@@ -30,6 +30,6 @@ export const transactionHash = (transaction) => {
  * @param {object} transactionInput {transaction, index, amount, address}
  */
 export const transactionInputHash = (transactionInput) => {
-	const {transaction, index, amount, address} = transactionInput;
-	return _SHA256({transaction, index, amount, address});
+	const {tx, index, amount, address} = transactionInput;
+	return _SHA256({tx, index, amount, address});
 };

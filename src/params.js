@@ -26,9 +26,27 @@ export const verbose = Boolean([
 
 export const olivia = process.argv.includes('olivia') || process.argv.includes('testnet');
 export const genesis = process.argv.includes('genesis');
-export const AppData = join(homedir(), 'AppData', 'Roaming', 'Leofcoin');
+export const AppData = join(homedir(), 'AppData', 'Roaming', olivia ? 'Leofcoin/olivia' : 'Leofcoin');
 const netHash = net => encode(keccak(Buffer.from(`${net}-`), 256)).slice(0, 24);
+export const APPDATAPATH = (() => {
+  switch (process.platform) {
+    case 'win32':
+      return join(homedir(), 'AppData', 'Roaming', 'Leofcoin', olivia ? 'olivia' : '')
+      break;
+    case 'linux':
+      return join(homedir(), '.leofcoin', olivia ? 'olivia' : '')
+      break;
+    case 'darwin':
+      // TODO: implement darwin path
+      break;
+    case 'android':
+      // TODO: implement android path
+      // experimental
+      break;
+  }
+})();
 
+export const walletPath = join(APPDATAPATH, 'wallet.dat');
 export const mainNethash = netHash('leofcoin');
 
 /**
