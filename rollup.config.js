@@ -64,7 +64,7 @@ export default [
 		experimentalDynamicImport: true
 	},
 	{
-		input: ['src/bips/bip32.js', 'src/lib/multi-hd-wallet.js', 'src/multi-signature.js'],
+		input: ['src/lib/multi-hd-wallet.js'],
 		output: {
 			dir: 'dist/commonjs',
 			format: 'cjs',
