@@ -4,16 +4,23 @@ import bitcoin from 'bitcoinjs-lib';
 import randomBytes from 'randombytes';
 import bs58 from 'bs58';
 import networks from './networks.js';
+import wif from 'wif';
+import bigi from 'bigi';
 // declare
 const { ECPair } = bitcoin;
 const { encode, decode } = bs58;
 
 export class CryptoWallet {
-	constructor(network) {
+	constructor(privateKey, publicKey, network) {
 		if (network) {
 			this.network = network;
 		} else {
 			this.network = 'olivia'; // harcoded to our testnet for now
+		}
+		if (privateKey) {
+			const big = bigi.fromBuffer(Buffer.from(privateKey, 'hex'));
+			this.pair = new ECPair(big, null, { network: this.network });
+			this._updateKeyPair(this.pair);
 		}
 	}
 
@@ -48,7 +55,12 @@ export class CryptoWallet {
 
 	get private() {
 		if (!this._private && this.wif) {
-			this.private = decode(this.wif).toString('hex'); // decode the wif with base58
+			// wid.decode => {version, privateKey, compressed}
+			// TODO: check version = network
+			const decoded = wif.decode(this.wif);
+			if (parseInt(decoded.version) !== parseInt(networks.olivia.wif))
+				throw new Error('Invalid wallet: invalid wallet import format version');
+			else this._private = decoded.privateKey.toString('hex'); // decode the wif
 		} else if (!this._private && !this.wif) {
 			throw new Error('Invalid wallet: missing wif or private key');
 		}
@@ -80,14 +92,14 @@ export class CryptoWallet {
 
 	lock(secret) {
 		return encrypt(this._jsonWallet, secret)
-      .then(cipher => this._cipher = cipher);
+			.then(cipher => this._cipher = cipher);
 	}
 
 	unlock(secret) {
 		return decrypt(this._cipher, secret).then(data => JSON.parse(data));
 	}
 
-  /**
+	/**
    * @return {object} {wif, address}
    */
 	_updateKeyPair(keyPair) {
@@ -96,7 +108,7 @@ export class CryptoWallet {
 		return { wif: this.wif, address: this.address };
 	}
 
-  /**
+	/**
    * Create new address using randomBytes
    */
 	_createRandomAddress() {
@@ -118,7 +130,7 @@ export class CryptoWallet {
 		return this._updateKeyPair(keyPair);
 	}
 
-  /**
+	/**
    * Create a new address
    * Returns a random address when hash is undefined.
    *
@@ -131,7 +143,7 @@ export class CryptoWallet {
 		return this._createRandomAddress();
 	}
 
-  /**
+	/**
    * Get the address using the wif (wallet import format)
    *
    * @param {*} wif The wif address to generate the public key from.
@@ -143,7 +155,15 @@ export class CryptoWallet {
 		this.address = ECPair.fromWIF(wif, this.network).getAddress();
 	}
 
-  /**
+	sign(hash) {
+		return this.pair.sign(hash).toCompact().toString('hex');
+	}
+
+	verify(hash, signature) {
+		return this.pair.verify(hash);
+	}
+
+	/**
    * Send coins to given address
    *
    * @param {*} address The address to send the coins to.
@@ -152,14 +172,14 @@ export class CryptoWallet {
    */
 	send() {
 		if (this.private && this.address) {
-      // TODO: finish ...
+			// TODO: finish ...
 		} else {
 			throw new Error('Invalid wallet: you should check you address and private key');
 		}
-    // createTransaction
+		// createTransaction
 	}
 
-  /**
+	/**
    * Send coins to given address
    *
    * @param {*} address The address to send the coins to.
@@ -170,11 +190,11 @@ export class CryptoWallet {
 		if (!this.private && this.wif) {
 			this.private = decode(this.wif).toString('hex'); // decode the wif with base58
 		} else if (this.private && this.public) {
-      // TODO: finish ...
+			// TODO: finish ...
 		} else {
 			throw new Error('Invalid wallet: you should check you address and private key');
 		}
-    // createTransaction
+		// createTransaction
 	}
 }
 export default CryptoWallet;
