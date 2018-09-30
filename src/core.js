@@ -7,7 +7,7 @@ import { DAGChain } from './lib/dagchain/dagchain';
 import { configPath, networkPath, network } from './params';
 import ipfsdNode from 'ipfsd-node';
 import { write } from 'crypto-io-fs';
-import ipfsStar from './lib/network/ipfs-star'
+import ipfsStar from './lib/network/ipfs-star';
 
 global.states = {
   ready: false,
@@ -57,7 +57,7 @@ export const core = async ({ genesis }) => {
     })
     await write(configPath, JSON.stringify(config, null, '\t'));
     const chain = new DAGChain({ genesis, network, ipfs });
-    await chain.init();    
+    await chain.init();
 	} catch (e) {
     if (e.code === 'ECONNREFUSED' || e.message && e.message.includes('cannot acquire lock')) {
       // await cleanRepo();
