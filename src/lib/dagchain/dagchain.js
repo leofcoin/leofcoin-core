@@ -148,6 +148,7 @@ export class DAGChain extends EventEmitter {
       bus.emit('syncing', true);
       if (this.index) {
         const { index, prevHash } = await this.localBlock();
+        await this.sync()
         const height = this.index.length - 1;
         let syncCount = height - index;
         const multihash = this.index[height].multihash;
