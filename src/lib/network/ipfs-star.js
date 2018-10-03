@@ -2,6 +2,7 @@ import { encode } from 'bs58';
 import { netPrefix } from './../../params'
 // TODO: rename to client
 global.peerset = new Map();
+let resolved = false;
 /**
  * removes peer from peerset
  */
@@ -20,13 +21,22 @@ const peerconnect = message => {
  * @param {method} options.subscribe pubsub subscriber
  * @param {method} options.publish pubsub publisher
  */
-export default (address, pubsub) => {
+export default (address, pubsub) => new Promise((resolve, reject) => {
 	if (!pubsub && !global.ipfs) throw Error('pubsub client not found');
 	else if (!pubsub && global.ipfs) pubsub = global.ipfs.pubsub;
 	const {subscribe, publish, unsubscribe} = pubsub;
   const peers = message => {
     subscribe(encode(Buffer.from(`${netPrefix}peernet-peer-connect`)), peerconnect);
     JSON.parse(message.data.toString()).forEach(peer => {
+      if (!resolved) {
+        resolved = true;
+        resolve({
+      		stop: async () => {
+      	    publish(encode(Buffer.from(`${netPrefix}peernet-peer-disconnect`)), Buffer(address));
+      		},
+          peers: () => peerset
+      	})
+      }
       peerset.set(peer[0], peer[1]);
     })
   	unsubscribe(encode(Buffer.from(`${netPrefix}peernet-peers`)), () => {});
@@ -37,10 +47,4 @@ export default (address, pubsub) => {
 	setTimeout(function () {
     publish(encode(Buffer.from(`${netPrefix}peernet`)), new Buffer(address));
   }, 500);
-	return {
-		stop: async () => {
-	    publish(encode(Buffer.from(`${netPrefix}peernet-peer-disconnect`)), Buffer(address));
-		},
-    peers: () => peerset
-	};
-};
+});
