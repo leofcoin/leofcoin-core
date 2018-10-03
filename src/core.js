@@ -25,7 +25,7 @@ export const core = async ({ genesis }) => {
       bootstrap: network,
       sharding: true,
       relayHop: true,
-      flags: ['--enable-pubsub-experiment'],
+      flags: ['--enable-namesys-pubsub', '--enable-pubsub-experiment'],
       repoPath: networkPath,
       cleanup: false
     });
