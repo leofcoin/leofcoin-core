@@ -20,7 +20,6 @@ export const core = async ({ genesis }) => {
 	try {
     const now = Date.now();
     const config = await getUserConfig;
-    const secure_now = Date.now();
     bus.emit('stage-one');
     const ipfsd = await ipfsdNode({
       bootstrap: network,
@@ -33,10 +32,13 @@ export const core = async ({ genesis }) => {
 
     // TODO: flags should be configurable @ start
     const { ipfs, addresses } = await ipfsd.start();
-    await connectBootstrap();
-    const star = ipfsStar(addresses[0], ipfs.pubsub);
-
     const ipfsd_now = Date.now();
+    await connectBootstrap();
+
+    const bootstrap_now = Date.now();
+    const star = await ipfsStar(addresses[0], ipfs.pubsub);
+    const star_now = Date.now();
+
     process.on('SIGINT', async () => {
       console.log("Caught interrupt signal");
       await star.stop();
@@ -50,8 +52,9 @@ export const core = async ({ genesis }) => {
     const connection_now = Date.now();
     bus.emit('stage-two');
     groupCollapsed('Initialize', () => {
-      log(`secure-connection took: ${(secure_now - now) / 1000} seconds`);
-      log(`ipfs daemon startup took: ${(ipfsd_now - secure_now) / 1000} seconds`);
+      log(`ipfs daemon startup took: ${(ipfsd_now - now) / 1000} seconds`);
+      log(`connecting with bootstrap took: ${(bootstrap_now - ipfsd_now) / 1000} seconds`);
+      log(`signal server startup took: ${(star_now - bootstrap_now) / 1000} seconds`);
       log(`peer connection took: ${(connection_now - ipfsd_now) / 1000} seconds`);
       log(`total load prep took ${(Date.now() - now) / 1000} seconds`);
     })
