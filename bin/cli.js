@@ -10,18 +10,18 @@ for (const param of process.argv) {
 	switch (param) {
 	case 'init':
 	case 'genesis':
-		options.genesis = true;
+		params.genesis = true;
 		break;
 	case 'olivia':
-		options.network = 'olivia';
+		params.network = 'olivia';
 		break;
 		// wether or not to seed ip address to our DynamicSeedDB
 	case 'dynamic-seed':
-		options.dynamic = true;
+		params.dynamic = true;
 		break;
 	}
 }
 
-const { core } = require('./../dist/core.js');
+const { core } = require('./../dist/commonjs/core.js');
 
 core(params);
