@@ -16,7 +16,7 @@ global.states = {
   mining: false
 };
 
-export const core = async ({ genesis }) => {
+export const core = async ({ genesis, network }) => {
 	try {
     const now = Date.now();
     const config = await getUserConfig;
@@ -71,5 +71,3 @@ export const core = async ({ genesis }) => {
     // process.exit()
 	}
 }
-
-export default core({genesis: false})

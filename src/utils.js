@@ -17,8 +17,6 @@ if (process.platform === 'win32') {
   });
 };
 
-// hardcode debug param for now
-process.env.DEBUG = true;
 export const debug = (text) => {
 	if (process.env.DEBUG) {
     const stack = new Error().stack;
