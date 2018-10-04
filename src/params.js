@@ -24,6 +24,10 @@ export const verbose = Boolean([
   return Number(p)
 }, -1) >= 0);
 
+if (verbose) {
+  process.env.DEBUG = true;
+}
+
 export const olivia = process.argv.includes('olivia') || process.argv.includes('testnet');
 export const genesis = process.argv.includes('genesis');
 export const AppData = join(homedir(), 'AppData', 'Roaming', olivia ? 'Leofcoin/olivia' : 'Leofcoin');
@@ -89,14 +93,14 @@ export const localDAGAddress = join(networkPath, 'db', 'dag.multiaddress');
 // untill seed is removed we retrieve the keys using socket.io
 // TODO: make AppData overwriteable
 export const seed = 'https://septimal-balinese-2547.dataplicity.io';
-export const seeds = 'QmdfTbBqBPQ7VNxZEYEj14VmRuZBkqFbiwReogJgS1zR1n';
+export const seeds = 'QmNeApjecrZezN8Hp24BbScuM1Y9f1Mgxbd9hBxfNoNrMP';
 export const configPath = join(AppData, 'core.config');
 export const reward = 150;
 export const consensusSubsidyInterval = 52500;
 export const consensusSubsidyPercentage = 12.5; // quarterlings
-export const genesisCID = '1220000026e43a85c01ab04183ecce485637ac15d7423bea5fd0a72019da9afe2936'; // // TODO: should be hardcoded
+export const genesisCID = '12200000033624b02b66ada5eaa1c8d2cf91be556ef3851781166f395ae8fbbcc19a';
 
-export const GENESISBS58 = 'uVd8DSSuJkh8P8WbMsUTknyidJV8V8eUBL8Pg8ijHbgQBnkjDVrKky5EWD19F3vY9uApjMkb47oah95qDrYXWqNbJzLKAWFaxdCmcjGFv';
+export const GENESISBS58 = 'cQeU4erNtZim35iksuW8ZuD6TLjhw887XNBCq2sCWt4RBZRyhj2ZRJXnPFM36XKTDXLKTMi4yYPejfbsxhKPvngd5YVcLPotKXNBN';
 export const GENESISBLOCK = (() => {
 	const block = JSON.parse(Buffer.from(decode(GENESISBS58)).toString());
 	block.hash = genesisCID.substring(4);
