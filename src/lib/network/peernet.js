@@ -37,7 +37,7 @@ let done = false;
 let runs = 0;
 
 export const resolvePeers = () => new Promise(resolve => {
-  if (runs === 5) {
+  if (runs === 2) {
     debug('searched for peers but none found, returning empty array');
     runs = 0;
     return resolve([]);
@@ -65,13 +65,20 @@ const getPeerAddresses = async peers => {
   return [...global.peerset.values()]
 }
 
+let conRuns = 0;
 export const _connect = async addresses =>
   new Promise(async (resolve, reject) => {
     // TODO: ignore address after 5 times
     try {
+      conRuns++;
       await ipfs.swarm.connect(addresses);
+      conRuns = 0;
       resolve();
     } catch (e) {
+      if (conRuns === 2) {
+        conRuns = 0;
+        return resolve();
+      }
       fail(e.message);
       debug('trying again');
       return setTimeout(async () => await _connect(addresses).then(() => resolve()), 1000);
@@ -79,7 +86,7 @@ export const _connect = async addresses =>
   });
 export const connectBootstrap = async addresses => {
   bus.emit('connecting', true);
-  debug('connecting bootsrap peers');
+  debug('connecting bootstrap peers');
 
   await _connect(signalServers);
 
@@ -93,6 +100,9 @@ export const connect = (peers = []) => new Promise(async (resolve, reject) => {
     const { id } = await ipfs.id();
     // TODO: filter using peerrep
     peers = await getPeerAddresses();
+    peers = peers.map(peer => {
+      if (!peer.includes(id)) return peer;
+    })
     await _connect(peers);
 
     succes(`connected to ${peers.length} peer(s)`);
