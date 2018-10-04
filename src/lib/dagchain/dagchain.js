@@ -71,7 +71,7 @@ export class DAGChain extends EventEmitter {
   async pin(multihash) {
     return new Promise(async (resolve, reject) => {
       try {
-        await this.ipfs.pin.add(multihash);
+        await this.ipfs.pin.add(multihash, {recursive: true});
         resolve();
       } catch (e) {
         reject(e)
@@ -84,7 +84,10 @@ export class DAGChain extends EventEmitter {
    */
   async addLink(multihash, link) {
     const newDAGChain = await this.ipfs.object.patch.addLink(multihash, link);
-    return await this.publish(encode(newDAGChain.multihash));
+    this.name = `/ipfs/${encode(newDAGChain.multihash)}`;
+    this.node = await this.get(this.link);
+    const published = await this.publish(encode(newDAGChain.multihash));
+    return published;
   }
 
   async lastLink() {
@@ -99,11 +102,6 @@ export class DAGChain extends EventEmitter {
     } catch (e) {
       console.error('Sync Error::', e);
     }
-  }
-  // TODO: decentralize
-  async lastBlock() {
-    const lastLink = await this.lastLink();
-    return await new DAGBlock(lastLink);
   }
 
   /**
@@ -133,7 +131,7 @@ export class DAGChain extends EventEmitter {
         console.log(`added block: ${block.index}  ${block.hash}`);
       }
       chain[block.index] = block;
-      console.log(`loaded block: ${block.index}  ${block.hash}`);
+      debug(`loaded block: ${block.index}  ${block.hash}`);
       if (block.prevHash && block.prevHash.length > 3) {
         return this.resolveBlocks(Buffer.from(`1220${block.prevHash}`, 'hex'), index);
       }
@@ -192,18 +190,16 @@ export class DAGChain extends EventEmitter {
   addBlock(block) {
     return new Promise(async (resolve, reject) => {
       log(`add block: ${block.index}  ${block.hash}`);
+      await this.updateLocalChain(block);
       chain[block.index] = block;
       bus.emit('block-added', block);
-      await this.sync();
       await this.pin(multihashFromHex(block.hash)); // pin block locally
       await this.updateLocals(`1220${block.hash}`, block.index, this.link);
-
       try {
-        await this.publish(this.link);
+        // await this.publish(this.link);
       } catch (e) {
         console.warn(e);
       }
-
       block.transactions.forEach(transaction => {
         const index = mempool.indexOf(transaction)
         mempool.splice(index)
@@ -273,8 +269,6 @@ export class DAGChain extends EventEmitter {
       try {
         // const previousBlock = await lastBlock(); // test
         await validate(chain[chain.length - 1], block, difficulty(), getUnspent());
-        // await this.sync();
-        await this.updateLocalChain(block);
         this.addBlock(block); // add to chain
       } catch (error) {
         // TODO: remove publish invalid-block
