@@ -1,10 +1,6 @@
 const browserLoader = () => {
 	const script = document.createElement('script');
-	if ('noModule' in script) {
-		script.src = 'dist/module/core.js';
-	} else {
-		script.src = 'dist/nomodule/core.js';
-	}
+	script.src = 'dist/module/core.js';
 	document.head.appendChild(script);
 };
 
