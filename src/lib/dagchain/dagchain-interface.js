@@ -101,16 +101,46 @@ export const difficulty = () => {
 		stamps.push(10);
 	}
 	let blocksMedian = median(stamps) || 10;
+  const average = blocksMedian;
   const offset = blocksMedian / 10
    // offset for quick recovery
-	if (blocksMedian < 9) {
+	if (blocksMedian < 10) {
 		blocksMedian -= offset;
-	} else if (blocksMedian > 11) {
+	} else if (blocksMedian > 10) {
 		blocksMedian += offset;
 	}
-  console.log(`Average Block Time: ${blocksMedian}`);
+  console.log(`Average Block Time: ${average}`);
   console.log(`Difficulty: ${10 / blocksMedian}`);
 	return 10000 / (10 / blocksMedian); // should result in a block every 10 seconds
+};
+
+export const instantDifficulty = () => {
+	// TODO: lower difficulty when transactionpool contain more then 500 tx ?
+	// TODO: raise difficulty when pool is empty
+	// get the last 128 blocks
+	const start = chain.length >= 128 ? (chain.length - 128) : 0;
+	const blocks = chain.slice(start, (chain.length - 1)).reverse();
+	const stamps = [];
+	for (var i = 0; i < blocks.length; i++) {
+		if (blocks[i + 1]) {
+			stamps.push(blocks[i].time - blocks[i + 1].time);
+		}
+	}
+	if (stamps.length === 0) {
+		stamps.push(1);
+	}
+	let blocksMedian = median(stamps) || 1;
+  const average = blocksMedian;
+  const offset = blocksMedian / 5;
+   // offset for quick recovery
+	if (blocksMedian < 0.5) {
+		blocksMedian -= offset;
+	} else if (blocksMedian > 1) {
+		blocksMedian += offset;
+	}
+  console.log(`Average Block Time: ${average}`);
+  console.log(`Difficulty: ${0.1 / blocksMedian}`);
+	return 10000 / (0.1 / blocksMedian); // should result in a block every 10 seconds
 };
 
 export const transformBlock = ({multihash, data}) => {
