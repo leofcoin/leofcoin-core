@@ -1,4 +1,4 @@
-import { server } from 'socket-request';
+import server from 'socket-request-server';
 import { read, write } from 'crypto-io-fs';
 import { APPDATAPATH, network } from '../params';
 import { join } from 'path';
